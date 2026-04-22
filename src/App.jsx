@@ -530,7 +530,8 @@ export default function App() {
         } else {
           const res = await fetch(API,{method:'POST',headers:HDR,body:JSON.stringify(toDB(data))})
           if (!res.ok) throw new Error(await res.text())
-          setOutlets(p=>[...p,fromDB((await res.json())[0])])
+          const created = fromDB((await res.json())[0])
+   setOutlets(p=>[...p,created])
         }
       } else {
         if (data.id) setOutlets(p=>p.map(o=>o.id===data.id?data:o))
