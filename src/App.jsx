@@ -5,7 +5,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const API = `${SUPABASE_URL}/rest/v1/outlets`
 const HDR = { 'Content-Type':'application/json', 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Prefer':'return=representation' }
 
-// Colour palette
+const PASSWORDS = { 'BRW829':'admin', 'loob123':'viewer' }
+
 const C = {
   bg:'#F5F6FA', white:'#FFFFFF', border:'#E2E8F0', text:'#1E293B', sub:'#64748B',
   accent:'#2563EB', accentBg:'#EFF6FF', green:'#16A34A', greenBg:'#DCFCE7',
@@ -16,18 +17,18 @@ const C = {
 const BRAND_COLOR = { 'Tealive':'#0EA5E9','Bask Bear Coffee':'#92400E','Ayee Southern Thai':'#DC2626','Gindaco':'#D97706','Croissant Taiyaki':'#CA8A04','Ding Dang':'#0891B2' }
 const BRAND_BG    = { 'Tealive':'#E0F2FE','Bask Bear Coffee':'#FEF3C7','Ayee Southern Thai':'#FEE2E2','Gindaco':'#FFFBEB','Croissant Taiyaki':'#FEFCE8','Ding Dang':'#CFFAFE' }
 
-const BRANDS  = ['All Brands','Tealive','Bask Bear Coffee','Ayee Southern Thai','Gindaco','Croissant Taiyaki','Ding Dang']
-const STATUSES= ['All','Active','Under Renovation','Pending Opening','Closed','Under Negotiation']
-const MODELS  = ['Franchise','Company-Owned','JV']
-const TYPES   = ['Mall','Shop Lot','Transport Hub','Airport','Hospital','University','Drive-Thru','Other']
-const SIZES   = ['Kiosk (<80sqft)','Small (80-200sqft)','Medium (200-500sqft)','Large (500-800sqft)','Flagship (>800sqft)']
-const NAV     = [
-  {key:'dashboard', label:'Dashboard',       icon:'▦'},
-  {key:'outlets',   label:'Outlets',         icon:'◫'},
-  {key:'lease',     label:'Lease & Deposits',icon:'⊟'},
-  {key:'compliance',label:'Compliance',      icon:'⊕'},
-  {key:'performance',label:'Performance',    icon:'◈'},
-  {key:'import',    label:'Import CSV',      icon:'↑'},
+const BRANDS   = ['All Brands','Tealive','Bask Bear Coffee','Ayee Southern Thai','Gindaco','Croissant Taiyaki','Ding Dang']
+const STATUSES = ['All','Active','Under Renovation','Pending Opening','Closed','Under Negotiation']
+const MODELS   = ['Franchise','Company-Owned','JV']
+const TYPES    = ['Mall','Shop Lot','Transport Hub','Airport','Hospital','University','Drive-Thru','Other']
+const SIZES    = ['Kiosk (<80sqft)','Small (80-200sqft)','Medium (200-500sqft)','Large (500-800sqft)','Flagship (>800sqft)']
+const NAV      = [
+  {key:'dashboard', label:'Dashboard',        icon:'▦'},
+  {key:'outlets',   label:'Outlets',          icon:'◫'},
+  {key:'lease',     label:'Lease & Deposits', icon:'⊟'},
+  {key:'compliance',label:'Compliance',       icon:'⊕'},
+  {key:'performance',label:'Performance',     icon:'◈'},
+  {key:'import',    label:'Import CSV',       icon:'↑', adminOnly:true},
 ]
 
 const EMPTY = {
@@ -119,69 +120,105 @@ const DB_FIELDS = [
 const MOCK = [
   {id:1,outletCode:'TL-001',outletFormat:'Inline',brand:'Tealive',outletName:'Mid Valley Megamall',state:'Kuala Lumpur',type:'Mall',model:'Franchise',status:'Active',openingDate:'2019-03-15',closureDate:'',storeSize:'Medium (200-500sqft)',sqft:350,storageSizeSqft:40,lat:'3.1175',lng:'101.6765',outletAddress:'Lot G-023, Mid Valley Megamall, 59200 KL',storageAddress:'Store Room B2-12',monthlyRental:22000,monthlySales:185000,atv:14.5,gto:2220000,serviceCharge:1800,apFees:500,securityDeposit:66000,utilitiesDeposit:5000,mailboxDeposit:0,fitoutDeposit:10000,restorationDeposit:15000,leaseExpiry:'2026-03-31',halalExpiry:'2025-12-31',lad:'RM500/day',ladRemarks:'Triggered if fitout exceeds handover date',landlordName:'IGB Berhad',tenantName:'Loob Holding Sdn Bhd',franchisee:'Tan Wei Liang',contact:'011-2345678',notes:'High performer'},
   {id:2,outletCode:'TL-002',outletFormat:'Inline',brand:'Tealive',outletName:'Sunway Pyramid',state:'Selangor',type:'Mall',model:'Franchise',status:'Active',openingDate:'2020-07-01',closureDate:'',storeSize:'Medium (200-500sqft)',sqft:420,storageSizeSqft:55,lat:'3.0731',lng:'101.6066',outletAddress:'Lot LG1-88, Sunway Pyramid, Subang Jaya',storageAddress:'Store LG1-S3',monthlyRental:28000,monthlySales:210000,atv:15.2,gto:2520000,serviceCharge:2200,apFees:600,securityDeposit:84000,utilitiesDeposit:6000,mailboxDeposit:200,fitoutDeposit:12000,restorationDeposit:18000,leaseExpiry:'2025-09-30',halalExpiry:'2025-06-30',lad:'RM800/day',ladRemarks:'After 14-day grace period',landlordName:'Sunway Malls',tenantName:'Loob Holding Sdn Bhd',franchisee:'Lim Soo Fen',contact:'012-9876543',notes:'Lease renewal urgent'},
-  {id:3,outletCode:'BB-001',outletFormat:'Cafe',brand:'Bask Bear Coffee',outletName:'IOI City Mall',state:'Selangor',type:'Mall',model:'Company-Owned',status:'Active',openingDate:'2021-11-20',closureDate:'',storeSize:'Large (500-800sqft)',sqft:600,storageSizeSqft:80,lat:'2.9726',lng:'101.7221',outletAddress:'Lot 2F-34, IOI City Mall, Putrajaya',storageAddress:'Back-of-house',monthlyRental:35000,monthlySales:155000,atv:18.0,gto:1860000,serviceCharge:3000,apFees:800,securityDeposit:105000,utilitiesDeposit:8000,mailboxDeposit:300,fitoutDeposit:20000,restorationDeposit:25000,leaseExpiry:'2027-06-30',halalExpiry:'2026-03-31',lad:'RM1000/day',ladRemarks:'Cap at 5% of contract',landlordName:'IOI Properties',tenantName:'Loob Holding Sdn Bhd',franchisee:'',contact:'',notes:'Flagship store'},
+  {id:3,outletCode:'BB-001',outletFormat:'Cafe',brand:'Bask Bear Coffee',outletName:'IOI City Mall',state:'Selangor',type:'Mall',model:'Company-Owned',status:'Active',openingDate:'2021-11-20',closureDate:'',storeSize:'Large (500-800sqft)',sqft:600,storageSizeSqft:80,lat:'2.9726',lng:'101.7221',outletAddress:'Lot 2F-34, IOI City Mall, Putrajaya',storageAddress:'Back-of-house',monthlyRental:35000,monthlySales:155000,atv:18.0,gto:1860000,serviceCharge:3000,apFees:800,securityDeposit:105000,utilitiesDeposit:8000,mailboxDeposit:300,fitoutDeposit:20000,restorationDeposit:25000,leaseExpiry:'2027-06-30',halalExpiry:'2026-03-31',lad:'RM1000/day',ladRemarks:'Cap at 5%',landlordName:'IOI Properties',tenantName:'Loob Holding Sdn Bhd',franchisee:'',contact:'',notes:'Flagship store'},
   {id:4,outletCode:'AY-001',outletFormat:'Restaurant',brand:'Ayee Southern Thai',outletName:'Pavilion Bukit Jalil',state:'Kuala Lumpur',type:'Mall',model:'Franchise',status:'Active',openingDate:'2023-01-10',closureDate:'',storeSize:'Flagship (>800sqft)',sqft:800,storageSizeSqft:120,lat:'3.0584',lng:'101.6901',outletAddress:'Lot 3F-11, Pavilion Bukit Jalil',storageAddress:'Store 3F-S5',monthlyRental:32000,monthlySales:98000,atv:22.5,gto:1176000,serviceCharge:4000,apFees:1000,securityDeposit:96000,utilitiesDeposit:10000,mailboxDeposit:300,fitoutDeposit:25000,restorationDeposit:30000,leaseExpiry:'2027-03-31',halalExpiry:'2026-06-30',lad:'RM1200/day',ladRemarks:'Under review',landlordName:'Pavilion Group',tenantName:'Loob Holding Sdn Bhd',franchisee:'Mohd Razif',contact:'019-8877665',notes:'Below target'},
-  {id:5,outletCode:'GD-001',outletFormat:'Kiosk',brand:'Gindaco',outletName:'Pavilion KL',state:'Kuala Lumpur',type:'Mall',model:'JV',status:'Active',openingDate:'2022-09-05',closureDate:'',storeSize:'Small (80-200sqft)',sqft:200,storageSizeSqft:20,lat:'3.1488',lng:'101.7131',outletAddress:'Lot G-118, Pavilion KL',storageAddress:'N/A',monthlyRental:25000,monthlySales:88000,atv:19.0,gto:1056000,serviceCharge:1200,apFees:400,securityDeposit:75000,utilitiesDeposit:5000,mailboxDeposit:200,fitoutDeposit:8000,restorationDeposit:12000,leaseExpiry:'2026-06-30',halalExpiry:'2025-09-30',lad:'RM700/day',ladRemarks:'JV partner co-liable',landlordName:'Pavilion Group',tenantName:'Gindaco Malaysia JV',franchisee:'JV Partner',contact:'',notes:'Monitor closely'},
+  {id:5,outletCode:'GD-001',outletFormat:'Kiosk',brand:'Gindaco',outletName:'Pavilion KL',state:'Kuala Lumpur',type:'Mall',model:'JV',status:'Active',openingDate:'2022-09-05',closureDate:'',storeSize:'Small (80-200sqft)',sqft:200,storageSizeSqft:20,lat:'3.1488',lng:'101.7131',outletAddress:'Lot G-118, Pavilion KL',storageAddress:'N/A',monthlyRental:25000,monthlySales:88000,atv:19.0,gto:1056000,serviceCharge:1200,apFees:400,securityDeposit:75000,utilitiesDeposit:5000,mailboxDeposit:200,fitoutDeposit:8000,restorationDeposit:12000,leaseExpiry:'2026-06-30',halalExpiry:'2025-09-30',lad:'RM700/day',ladRemarks:'JV co-liable',landlordName:'Pavilion Group',tenantName:'Gindaco Malaysia JV',franchisee:'JV Partner',contact:'',notes:'Monitor closely'},
 ]
 
-// helpers
 const rsr  = (r,s) => (!s||s==0) ? null : ((r/s)*100).toFixed(1)
 const days = d => !d ? null : Math.ceil((new Date(d)-new Date())/86400000)
 const fRM  = v => (v===''||v===null||v===undefined) ? '—' : 'RM '+Number(v).toLocaleString()
 const dep  = o => [o.securityDeposit,o.utilitiesDeposit,o.mailboxDeposit,o.fitoutDeposit,o.restorationDeposit].reduce((s,v)=>s+(Number(v)||0),0)
 const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g,'')
+const stopKey = e => e.stopPropagation()
 
 function toDB(o) {
   return {
-    outlet_code:o.outletCode, outlet_format:o.outletFormat, brand:o.brand,
-    outlet_name:o.outletName, state:o.state, type:o.type, model:o.model, status:o.status,
-    opening_date:o.openingDate||null, closure_date:o.closureDate||null,
-    store_size:o.storeSize, sqft:o.sqft||null, storage_size_sqft:o.storageSizeSqft||null,
-    lat:o.lat, lng:o.lng, outlet_address:o.outletAddress, storage_address:o.storageAddress,
-    monthly_rental:o.monthlyRental||null, monthly_sales:o.monthlySales||null,
-    atv:o.atv||null, gto:o.gto||null, service_charge:o.serviceCharge||null, ap_fees:o.apFees||null,
-    security_deposit:o.securityDeposit||null, utilities_deposit:o.utilitiesDeposit||null,
-    mailbox_deposit:o.mailboxDeposit||null, fitout_deposit:o.fitoutDeposit||null,
+    outlet_code:o.outletCode,outlet_format:o.outletFormat,brand:o.brand,
+    outlet_name:o.outletName,state:o.state,type:o.type,model:o.model,status:o.status,
+    opening_date:o.openingDate||null,closure_date:o.closureDate||null,
+    store_size:o.storeSize,sqft:o.sqft||null,storage_size_sqft:o.storageSizeSqft||null,
+    lat:o.lat,lng:o.lng,outlet_address:o.outletAddress,storage_address:o.storageAddress,
+    monthly_rental:o.monthlyRental||null,monthly_sales:o.monthlySales||null,
+    atv:o.atv||null,gto:o.gto||null,service_charge:o.serviceCharge||null,ap_fees:o.apFees||null,
+    security_deposit:o.securityDeposit||null,utilities_deposit:o.utilitiesDeposit||null,
+    mailbox_deposit:o.mailboxDeposit||null,fitout_deposit:o.fitoutDeposit||null,
     restoration_deposit:o.restorationDeposit||null,
-    lease_expiry:o.leaseExpiry||null, halal_expiry:o.halalExpiry||null,
-    lad:o.lad, lad_remarks:o.ladRemarks, landlord_name:o.landlordName, tenant_name:o.tenantName,
-    franchisee:o.franchisee, contact:o.contact, notes:o.notes,
-  }
-}
-function fromDB(r) {
-  return {
-    id:r.id, outletCode:r.outlet_code||'', outletFormat:r.outlet_format||'',
-    brand:r.brand||'', outletName:r.outlet_name||'', state:r.state||'',
-    type:r.type||'', model:r.model||'', status:r.status||'Active',
-    openingDate:r.opening_date||'', closureDate:r.closure_date||'',
-    storeSize:r.store_size||'', sqft:r.sqft||'', storageSizeSqft:r.storage_size_sqft||'',
-    lat:r.lat||'', lng:r.lng||'', outletAddress:r.outlet_address||'', storageAddress:r.storage_address||'',
-    monthlyRental:r.monthly_rental||'', monthlySales:r.monthly_sales||'',
-    atv:r.atv||'', gto:r.gto||'', serviceCharge:r.service_charge||'', apFees:r.ap_fees||'',
-    securityDeposit:r.security_deposit||'', utilitiesDeposit:r.utilities_deposit||'',
-    mailboxDeposit:r.mailbox_deposit||'', fitoutDeposit:r.fitout_deposit||'',
-    restorationDeposit:r.restoration_deposit||'',
-    leaseExpiry:r.lease_expiry||'', halalExpiry:r.halal_expiry||'',
-    lad:r.lad||'', ladRemarks:r.lad_remarks||'',
-    landlordName:r.landlord_name||'', tenantName:r.tenant_name||'',
-    franchisee:r.franchisee||'', contact:r.contact||'', notes:r.notes||'',
+    lease_expiry:o.leaseExpiry||null,halal_expiry:o.halalExpiry||null,
+    lad:o.lad,lad_remarks:o.ladRemarks,landlord_name:o.landlordName,tenant_name:o.tenantName,
+    franchisee:o.franchisee,contact:o.contact,notes:o.notes,
   }
 }
 
-// ─── UI primitives ────────────────────────────────────────────────
-function StatusPill({ status }) {
-  const m = {
-    'Active':[C.green,C.greenBg], 'Under Renovation':[C.amber,C.amberBg],
-    'Pending Opening':[C.blue,C.blueBg], 'Closed':['#6B7280','#F3F4F6'],
-    'Under Negotiation':[C.purple,C.purpleBg],
+function fromDB(r) {
+  return {
+    id:r.id,outletCode:r.outlet_code||'',outletFormat:r.outlet_format||'',
+    brand:r.brand||'',outletName:r.outlet_name||'',state:r.state||'',
+    type:r.type||'',model:r.model||'',status:r.status||'Active',
+    openingDate:r.opening_date||'',closureDate:r.closure_date||'',
+    storeSize:r.store_size||'',sqft:r.sqft||'',storageSizeSqft:r.storage_size_sqft||'',
+    lat:r.lat||'',lng:r.lng||'',outletAddress:r.outlet_address||'',storageAddress:r.storage_address||'',
+    monthlyRental:r.monthly_rental||'',monthlySales:r.monthly_sales||'',
+    atv:r.atv||'',gto:r.gto||'',serviceCharge:r.service_charge||'',apFees:r.ap_fees||'',
+    securityDeposit:r.security_deposit||'',utilitiesDeposit:r.utilities_deposit||'',
+    mailboxDeposit:r.mailbox_deposit||'',fitoutDeposit:r.fitout_deposit||'',
+    restorationDeposit:r.restoration_deposit||'',
+    leaseExpiry:r.lease_expiry||'',halalExpiry:r.halal_expiry||'',
+    lad:r.lad||'',ladRemarks:r.lad_remarks||'',
+    landlordName:r.landlord_name||'',tenantName:r.tenant_name||'',
+    franchisee:r.franchisee||'',contact:r.contact||'',notes:r.notes||'',
   }
+}
+
+function LoginScreen({ onLogin }) {
+  const [pw,  setPw]  = useState('')
+  const [err, setErr] = useState('')
+  const [show,setShow]= useState(false)
+  function attempt() {
+    const role = PASSWORDS[pw.trim()]
+    if (role) { sessionStorage.setItem('loob_role',role); onLogin(role) }
+    else { setErr('Incorrect password. Please try again.'); setPw('') }
+  }
+  return (
+    <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,"Segoe UI",sans-serif'}}>
+      <div style={{background:'#fff',borderRadius:20,padding:'48px 44px',width:400,boxShadow:'0 8px 40px rgba(0,0,0,0.10)',textAlign:'center'}}>
+        <div style={{fontSize:38,marginBottom:16}}>🔒</div>
+        <div style={{fontSize:11,letterSpacing:3,color:C.sub,fontWeight:700,marginBottom:6}}>LOOB HOLDING</div>
+        <div style={{fontSize:24,fontWeight:800,color:C.text,marginBottom:4}}>Outlet Manager</div>
+        <div style={{fontSize:14,color:C.sub,marginBottom:32}}>Enter your access password to continue</div>
+        <div style={{position:'relative',marginBottom:14}}>
+          <input
+            type={show?'text':'password'}
+            value={pw}
+            onChange={e=>{setPw(e.target.value);setErr('')}}
+            onKeyDown={e=>{e.stopPropagation();if(e.key==='Enter')attempt()}}
+            placeholder="Enter password"
+            autoFocus
+            style={{width:'100%',padding:'12px 44px 12px 16px',borderRadius:10,border:`1.5px solid ${err?'#FCA5A5':C.border}`,fontSize:15,outline:'none',boxSizing:'border-box',color:C.text,background:'#F8FAFC'}}
+          />
+          <button onClick={()=>setShow(!show)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:C.sub,fontSize:15}}>
+            {show?'🙈':'👁️'}
+          </button>
+        </div>
+        {err&&<div style={{background:C.redBg,color:C.red,borderRadius:8,padding:'10px 14px',fontSize:13,fontWeight:500,marginBottom:14}}>{err}</div>}
+        <button onClick={attempt} style={{width:'100%',background:C.accent,color:'#fff',border:'none',borderRadius:10,padding:'13px',fontSize:15,fontWeight:700,cursor:'pointer'}}>
+          Sign In →
+        </button>
+        <div style={{marginTop:22,fontSize:12,color:'#94A3B8'}}>Contact your administrator for access</div>
+      </div>
+    </div>
+  )
+}
+
+function StatusPill({ status }) {
+  const m = {'Active':[C.green,C.greenBg],'Under Renovation':[C.amber,C.amberBg],'Pending Opening':[C.blue,C.blueBg],'Closed':['#6B7280','#F3F4F6'],'Under Negotiation':[C.purple,C.purpleBg]}
   const [fg,bg] = m[status]||['#6B7280','#F3F4F6']
   return <span style={{background:bg,color:fg,padding:'3px 10px',borderRadius:99,fontSize:13,fontWeight:700}}>{status}</span>
 }
 
 function DaysBadge({ d }) {
   if (d===null) return <span style={{color:'#9CA3AF'}}>—</span>
-  const [bg,color,label] = d<0 ? [C.redBg,C.red,'EXPIRED'] : d<60 ? [C.redBg,C.red,d+'d'] : d<120 ? [C.amberBg,C.amber,d+'d'] : [C.greenBg,C.green,d+'d']
+  const [bg,color,label] = d<0?[C.redBg,C.red,'EXPIRED']:d<60?[C.redBg,C.red,d+'d']:d<120?[C.amberBg,C.amber,d+'d']:[C.greenBg,C.green,d+'d']
   return <span style={{background:bg,color,padding:'3px 10px',borderRadius:99,fontSize:13,fontWeight:700}}>{label}</span>
 }
 
@@ -193,12 +230,8 @@ function RSB({ ratio }) {
 
 function Toast({ msg, type }) {
   if (!msg) return null
-  const [bg,color] = type==='error' ? [C.redBg,C.red] : type==='loading' ? [C.blueBg,C.blue] : [C.greenBg,C.green]
-  return (
-    <div style={{position:'fixed',bottom:24,right:24,background:bg,border:`1px solid ${color}`,borderRadius:12,padding:'14px 22px',fontSize:15,fontWeight:600,color,zIndex:9999,boxShadow:'0 4px 24px rgba(0,0,0,0.1)'}}>
-      {type==='loading'?'⟳ ':type==='error'?'✕ ':'✓ '}{msg}
-    </div>
-  )
+  const [bg,color] = type==='error'?[C.redBg,C.red]:type==='loading'?[C.blueBg,C.blue]:[C.greenBg,C.green]
+  return <div style={{position:'fixed',bottom:24,right:24,background:bg,border:`1px solid ${color}`,borderRadius:12,padding:'14px 22px',fontSize:15,fontWeight:600,color,zIndex:9999,boxShadow:'0 4px 24px rgba(0,0,0,0.1)'}}>{type==='loading'?'⟳ ':type==='error'?'✕ ':'✓ '}{msg}</div>
 }
 
 function DelModal({ outlet, onConfirm, onCancel }) {
@@ -218,112 +251,71 @@ function DelModal({ outlet, onConfirm, onCancel }) {
   )
 }
 
-// ─── CSV helpers ──────────────────────────────────────────────────
 function parseCSV(text) {
   const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim())
-  const rows = lines.slice(1).map(line => {
-    const vals = []; let cur = '', inQ = false
-    for (const ch of line) {
-      if (ch==='"') inQ=!inQ
-      else if (ch===','&&!inQ) { vals.push(cur.trim()); cur='' }
-      else cur+=ch
-    }
+  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim())
+  const rows = lines.slice(1).map(line=>{
+    const vals=[];let cur='',inQ=false
+    for(const ch of line){if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){vals.push(cur.trim());cur='';}else cur+=ch}
     vals.push(cur.trim())
-    const obj = {}
-    headers.forEach((h,i) => { obj[h] = vals[i]||'' })
-    return obj
+    const obj={};headers.forEach((h,i)=>{obj[h]=vals[i]||''});return obj
   })
-  return { headers, rows }
+  return {headers,rows}
 }
 
 function autoMap(headers) {
-  const map = {}
-  DB_FIELDS.forEach(f => {
-    const fk=norm(f.key), fl=norm(f.label)
-    const match = headers.find(h => { const hn=norm(h); return hn===fk||hn===fl||hn.includes(fk)||fk.includes(hn)||hn.includes(fl)||fl.includes(hn) })
-    map[f.key] = match||''
+  const map={}
+  DB_FIELDS.forEach(f=>{
+    const fk=norm(f.key),fl=norm(f.label)
+    const match=headers.find(h=>{const hn=norm(h);return hn===fk||hn===fl||hn.includes(fk)||fk.includes(hn)||hn.includes(fl)||fl.includes(hn)})
+    map[f.key]=match||''
   })
   return map
 }
 
-// ─── Import View ──────────────────────────────────────────────────
 function ImportView({ onImported, showToast, isLive }) {
-  const [step, setStep]       = useState(1)
-  const [csv,  setCsv]        = useState(null)
-  const [map,  setMap]        = useState({})
-  const [prev, setPrev]       = useState([])
-  const [busy, setBusy]       = useState(false)
-  const [pct,  setPct]        = useState(0)
+  const [step,setStep]=useState(1)
+  const [csv,setCsv]=useState(null)
+  const [map,setMap]=useState({})
+  const [prev,setPrev]=useState([])
+  const [busy,setBusy]=useState(false)
+  const [pct,setPct]=useState(0)
+  const inp={background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'8px 12px',borderRadius:8,fontSize:14,outline:'none',width:'100%',boxSizing:'border-box'}
 
-  const inp = { background:'#fff', border:`1px solid ${C.border}`, color:C.text, padding:'8px 12px', borderRadius:8, fontSize:14, outline:'none', width:'100%', boxSizing:'border-box' }
-
-  function onFile(e) {
-    const f = e.target.files[0]; if (!f) return
-    const r = new FileReader()
-    r.onload = ev => {
-      try {
-        const { headers, rows } = parseCSV(ev.target.result)
-        setCsv({ headers, rows }); setMap(autoMap(headers)); setStep(2)
-      } catch(err) { showToast('Cannot parse CSV: '+err.message,'error') }
-    }
+  function onFile(e){
+    const f=e.target.files[0];if(!f)return
+    const r=new FileReader()
+    r.onload=ev=>{try{const{headers,rows}=parseCSV(ev.target.result);setCsv({headers,rows});setMap(autoMap(headers));setStep(2)}catch(err){showToast('Cannot parse CSV: '+err.message,'error')}}
     r.readAsText(f)
   }
 
-  function buildPreview() {
-    setPrev(csv.rows.slice(0,5).map(row => {
-      const o={}; DB_FIELDS.forEach(f => { o[f.key]=map[f.key]?row[map[f.key]]||'':'' }); return o
-    }))
+  function buildPreview(){
+    setPrev(csv.rows.slice(0,5).map(row=>{const o={};DB_FIELDS.forEach(f=>{o[f.key]=map[f.key]?row[map[f.key]]||'':''});return o}))
     setStep(3)
   }
 
-  async function doImport() {
-    setBusy(true); setPct(0)
-    const all = csv.rows.map(row => { const o={}; DB_FIELDS.forEach(f => { o[f.key]=map[f.key]?row[map[f.key]]||'':'' }); return o })
-    if (!isLive) {
-      await new Promise(r=>setTimeout(r,1200))
-      setBusy(false); onImported(all.map((o,i)=>({...o,id:Date.now()+i}))); return
+  async function doImport(){
+    setBusy(true);setPct(0)
+    const all=csv.rows.map(row=>{const o={};DB_FIELDS.forEach(f=>{o[f.key]=map[f.key]?row[map[f.key]]||'':''});return o})
+    if(!isLive){await new Promise(r=>setTimeout(r,1200));setBusy(false);onImported(all.map((o,i)=>({...o,id:Date.now()+i})));return}
+    const toNum=v=>v?Number(String(v).replace(/[^0-9.]/g,''))||null:null
+    const BATCH=50;const done=[]
+    for(let i=0;i<all.length;i+=BATCH){
+      const batch=all.slice(i,i+BATCH).map(o=>({outlet_code:o.outletCode,outlet_format:o.outletFormat,brand:o.brand,outlet_name:o.outletName,state:o.state,type:o.type,model:o.model,status:o.status||'Active',opening_date:o.openingDate||null,closure_date:o.closureDate||null,store_size:o.storeSize,sqft:toNum(o.sqft),storage_size_sqft:toNum(o.storageSizeSqft),lat:o.lat,lng:o.lng,outlet_address:o.outletAddress,storage_address:o.storageAddress,monthly_rental:toNum(o.monthlyRental),monthly_sales:toNum(o.monthlySales),atv:toNum(o.atv),gto:toNum(o.gto),service_charge:toNum(o.serviceCharge),ap_fees:toNum(o.apFees),security_deposit:toNum(o.securityDeposit),utilities_deposit:toNum(o.utilitiesDeposit),mailbox_deposit:toNum(o.mailboxDeposit),fitout_deposit:toNum(o.fitoutDeposit),restoration_deposit:toNum(o.restorationDeposit),lease_expiry:o.leaseExpiry||null,halal_expiry:o.halalExpiry||null,lad:o.lad,lad_remarks:o.ladRemarks,landlord_name:o.landlordName,tenant_name:o.tenantName,franchisee:o.franchisee,contact:o.contact,notes:o.notes}))
+      try{const res=await fetch(API,{method:'POST',headers:HDR,body:JSON.stringify(batch)});if(!res.ok)throw new Error(await res.text());done.push(...(await res.json()).map(fromDB));setPct(Math.min(100,Math.round(((i+BATCH)/all.length)*100)))}
+      catch(err){showToast('Import error: '+err.message,'error');setBusy(false);return}
     }
-    const toNum = v => v ? Number(String(v).replace(/[^0-9.]/g,''))||null : null
-    const BATCH=50; const done=[]
-    for (let i=0; i<all.length; i+=BATCH) {
-      const batch = all.slice(i,i+BATCH).map(o => ({
-        outlet_code:o.outletCode, outlet_format:o.outletFormat, brand:o.brand,
-        outlet_name:o.outletName, state:o.state, type:o.type, model:o.model, status:o.status||'Active',
-        opening_date:o.openingDate||null, closure_date:o.closureDate||null,
-        store_size:o.storeSize, sqft:toNum(o.sqft), storage_size_sqft:toNum(o.storageSizeSqft),
-        lat:o.lat, lng:o.lng, outlet_address:o.outletAddress, storage_address:o.storageAddress,
-        monthly_rental:toNum(o.monthlyRental), monthly_sales:toNum(o.monthlySales),
-        atv:toNum(o.atv), gto:toNum(o.gto), service_charge:toNum(o.serviceCharge), ap_fees:toNum(o.apFees),
-        security_deposit:toNum(o.securityDeposit), utilities_deposit:toNum(o.utilitiesDeposit),
-        mailbox_deposit:toNum(o.mailboxDeposit), fitout_deposit:toNum(o.fitoutDeposit),
-        restoration_deposit:toNum(o.restorationDeposit),
-        lease_expiry:o.leaseExpiry||null, halal_expiry:o.halalExpiry||null,
-        lad:o.lad, lad_remarks:o.ladRemarks, landlord_name:o.landlordName, tenant_name:o.tenantName,
-        franchisee:o.franchisee, contact:o.contact, notes:o.notes,
-      }))
-      try {
-        const res = await fetch(API,{method:'POST',headers:HDR,body:JSON.stringify(batch)})
-        if (!res.ok) throw new Error(await res.text())
-        done.push(...(await res.json()).map(fromDB))
-        setPct(Math.min(100,Math.round(((i+BATCH)/all.length)*100)))
-      } catch(err) { showToast('Import error: '+err.message,'error'); setBusy(false); return }
-    }
-    setBusy(false); onImported(done)
+    setBusy(false);onImported(done)
   }
 
-  const card = { background:'#fff', border:`1px solid ${C.border}`, borderRadius:14, padding:28, boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }
-
-  return (
+  const card={background:'#fff',border:`1px solid ${C.border}`,borderRadius:14,padding:28,boxShadow:'0 1px 4px rgba(0,0,0,0.06)'}
+  return(
     <div style={{maxWidth:960,margin:'0 auto'}}>
-      {/* Step indicator */}
       <div style={{display:'flex',alignItems:'center',marginBottom:28}}>
-        {['Upload CSV','Map Columns','Preview & Import'].map((s,i) => (
+        {['Upload CSV','Map Columns','Preview & Import'].map((s,i)=>(
           <div key={s} style={{display:'flex',alignItems:'center',flex:1}}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
-              <div style={{width:30,height:30,borderRadius:99,background:step>i+1?C.green:step===i+1?C.accent:'#E5E7EB',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700}}>
-                {step>i+1?'✓':i+1}
-              </div>
+              <div style={{width:30,height:30,borderRadius:99,background:step>i+1?C.green:step===i+1?C.accent:'#E5E7EB',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700}}>{step>i+1?'✓':i+1}</div>
               <span style={{fontSize:15,fontWeight:600,color:step===i+1?C.text:C.sub}}>{s}</span>
             </div>
             {i<2&&<div style={{flex:1,height:2,background:'#E5E7EB',margin:'0 14px'}}/>}
@@ -331,41 +323,38 @@ function ImportView({ onImported, showToast, isLive }) {
         ))}
       </div>
 
-      {step===1 && (
+      {step===1&&(
         <div style={card}>
           <div style={{fontSize:18,fontWeight:700,color:C.text,marginBottom:6}}>Upload your Excel file as CSV</div>
           <div style={{fontSize:14,color:C.sub,marginBottom:20}}>In Excel → <strong style={{color:C.text}}>File → Save As → CSV (Comma delimited)</strong></div>
-          {!isLive && <div style={{background:C.amberBg,border:`1px solid ${C.amber}`,borderRadius:10,padding:'12px 16px',fontSize:14,color:C.amber,marginBottom:20,fontWeight:500}}>⚠ Preview mode — deploy to Vercel for real Supabase imports.</div>}
+          {!isLive&&<div style={{background:C.amberBg,border:`1px solid ${C.amber}`,borderRadius:10,padding:'12px 16px',fontSize:14,color:C.amber,marginBottom:20}}>⚠ Preview mode — deploy to Vercel for real imports.</div>}
           <label style={{display:'block',border:`2px dashed ${C.border}`,borderRadius:12,padding:'50px 20px',textAlign:'center',cursor:'pointer',background:C.bg}}>
             <input type="file" accept=".csv" onChange={onFile} style={{display:'none'}}/>
             <div style={{fontSize:48,marginBottom:12}}>📂</div>
             <div style={{fontSize:17,fontWeight:600,color:C.text,marginBottom:6}}>Click to select your CSV file</div>
-            <div style={{fontSize:14,color:C.sub}}>Column names don't need to match — you'll map them in the next step</div>
+            <div style={{fontSize:14,color:C.sub}}>Column names don't need to match — you'll map them next</div>
           </label>
           <div style={{marginTop:20,background:'#F8FAFC',borderRadius:10,padding:16}}>
             <div style={{fontSize:13,fontWeight:700,color:C.sub,marginBottom:8}}>TIPS</div>
-            <div style={{fontSize:14,color:C.sub,lineHeight:1.9}}>• Dates in YYYY-MM-DD format (e.g. 2026-03-31)<br/>• Amounts as numbers only — no "RM" prefix needed<br/>• Empty columns will be left blank and can be filled later via Edit</div>
+            <div style={{fontSize:14,color:C.sub,lineHeight:1.9}}>• Dates in YYYY-MM-DD format (e.g. 2026-03-31)<br/>• Amounts as numbers only — no "RM" prefix<br/>• Empty columns can be filled later via Edit</div>
           </div>
         </div>
       )}
 
-      {step===2 && csv && (
+      {step===2&&csv&&(
         <div style={card}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
-            <div>
-              <div style={{fontSize:18,fontWeight:700,color:C.text}}>Map your columns</div>
-              <div style={{fontSize:14,color:C.sub,marginTop:3}}>{csv.rows.length} rows · {csv.headers.length} columns · auto-matched where possible</div>
-            </div>
+            <div><div style={{fontSize:18,fontWeight:700,color:C.text}}>Map your columns</div><div style={{fontSize:14,color:C.sub,marginTop:3}}>{csv.rows.length} rows · {csv.headers.length} columns · auto-matched where possible</div></div>
             <div style={{display:'flex',gap:10}}>
               <button onClick={()=>setStep(1)} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 18px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:600}}>← Back</button>
               <button onClick={buildPreview} style={{background:C.accent,border:'none',color:'#fff',padding:'9px 18px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:700}}>Preview →</button>
             </div>
           </div>
           <div style={{maxHeight:420,overflowY:'auto',display:'grid',gridTemplateColumns:'1fr 1fr',columnGap:24,rowGap:2}}>
-            {DB_FIELDS.map(f => (
+            {DB_FIELDS.map(f=>(
               <div key={f.key} style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,alignItems:'center',padding:'6px 0',borderBottom:`1px solid ${C.border}`}}>
                 <div style={{fontSize:14,fontWeight:600,color:map[f.key]?C.text:C.sub}}>{f.label}</div>
-                <select value={map[f.key]||''} onChange={e=>setMap(m=>({...m,[f.key]:e.target.value}))} style={{...inp,fontSize:13,padding:'6px 10px'}}>
+                <select value={map[f.key]||''} onChange={e=>setMap(m=>({...m,[f.key]:e.target.value}))} onKeyDown={stopKey} style={{...inp,fontSize:13,padding:'6px 10px'}}>
                   <option value="">— skip —</option>
                   {csv.headers.map(h=><option key={h} value={h}>{h}</option>)}
                 </select>
@@ -375,14 +364,11 @@ function ImportView({ onImported, showToast, isLive }) {
         </div>
       )}
 
-      {step===3 && (
+      {step===3&&(
         <div>
           <div style={{...card,marginBottom:16}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:busy?16:0}}>
-              <div>
-                <div style={{fontSize:18,fontWeight:700,color:C.text}}>Preview — first 5 rows</div>
-                <div style={{fontSize:14,color:C.sub,marginTop:3}}>{csv.rows.length} outlets ready to import</div>
-              </div>
+              <div><div style={{fontSize:18,fontWeight:700,color:C.text}}>Preview — first 5 rows</div><div style={{fontSize:14,color:C.sub,marginTop:3}}>{csv.rows.length} outlets ready to import</div></div>
               <div style={{display:'flex',gap:10}}>
                 <button onClick={()=>setStep(2)} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 18px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:600}}>← Back</button>
                 <button onClick={doImport} disabled={busy} style={{background:busy?'#93C5FD':C.accent,border:'none',color:'#fff',padding:'9px 22px',borderRadius:9,cursor:busy?'not-allowed':'pointer',fontSize:14,fontWeight:700,minWidth:190}}>
@@ -390,32 +376,24 @@ function ImportView({ onImported, showToast, isLive }) {
                 </button>
               </div>
             </div>
-            {busy && <div style={{marginTop:14}}><div style={{height:8,background:'#E5E7EB',borderRadius:99}}><div style={{width:pct+'%',height:'100%',background:C.accent,borderRadius:99,transition:'width 0.3s'}}/></div><div style={{fontSize:13,color:C.sub,marginTop:5}}>{pct}% complete</div></div>}
+            {busy&&<div style={{marginTop:14}}><div style={{height:8,background:'#E5E7EB',borderRadius:99}}><div style={{width:pct+'%',height:'100%',background:C.accent,borderRadius:99,transition:'width 0.3s'}}/></div><div style={{fontSize:13,color:C.sub,marginTop:5}}>{pct}% complete</div></div>}
           </div>
           <div style={{...card,overflowX:'auto'}}>
             <table style={{width:'100%',borderCollapse:'collapse',fontSize:14}}>
-              <thead>
-                <tr style={{borderBottom:`2px solid ${C.border}`}}>
-                  {['Code','Brand','Outlet Name','State','Status','Rental','Sales','Lease Expiry','Franchisee'].map(h=>(
-                    <th key={h} style={{padding:'10px 12px',textAlign:'left',color:C.sub,fontWeight:700,fontSize:13}}>{h}</th>
-                  ))}
+              <thead><tr style={{borderBottom:`2px solid ${C.border}`}}>{['Code','Brand','Outlet Name','State','Status','Rental','Sales','Lease Expiry','Franchisee'].map(h=><th key={h} style={{padding:'10px 12px',textAlign:'left',color:C.sub,fontWeight:700,fontSize:13}}>{h}</th>)}</tr></thead>
+              <tbody>{prev.map((row,i)=>(
+                <tr key={i} style={{borderBottom:`1px solid ${C.border}`,background:i%2===0?'#fff':'#F8FAFC'}}>
+                  <td style={{padding:'10px 12px',color:C.accent,fontWeight:700,fontFamily:'monospace'}}>{row.outletCode||'—'}</td>
+                  <td style={{padding:'10px 12px',color:BRAND_COLOR[row.brand]||C.text,fontWeight:600}}>{row.brand||'—'}</td>
+                  <td style={{padding:'10px 12px',fontWeight:600,color:C.text}}>{row.outletName||'—'}</td>
+                  <td style={{padding:'10px 12px',color:C.sub}}>{row.state||'—'}</td>
+                  <td style={{padding:'10px 12px',color:C.sub}}>{row.status||'—'}</td>
+                  <td style={{padding:'10px 12px'}}>{row.monthlyRental?'RM '+Number(row.monthlyRental).toLocaleString():'—'}</td>
+                  <td style={{padding:'10px 12px'}}>{row.monthlySales?'RM '+Number(row.monthlySales).toLocaleString():'—'}</td>
+                  <td style={{padding:'10px 12px',color:C.sub}}>{row.leaseExpiry||'—'}</td>
+                  <td style={{padding:'10px 12px',color:C.sub}}>{row.franchisee||'—'}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {prev.map((row,i)=>(
-                  <tr key={i} style={{borderBottom:`1px solid ${C.border}`,background:i%2===0?'#fff':'#F8FAFC'}}>
-                    <td style={{padding:'10px 12px',color:C.accent,fontWeight:700,fontFamily:'monospace'}}>{row.outletCode||'—'}</td>
-                    <td style={{padding:'10px 12px',color:BRAND_COLOR[row.brand]||C.text,fontWeight:600}}>{row.brand||'—'}</td>
-                    <td style={{padding:'10px 12px',fontWeight:600,color:C.text}}>{row.outletName||'—'}</td>
-                    <td style={{padding:'10px 12px',color:C.sub}}>{row.state||'—'}</td>
-                    <td style={{padding:'10px 12px',color:C.sub}}>{row.status||'—'}</td>
-                    <td style={{padding:'10px 12px'}}>{row.monthlyRental?'RM '+Number(row.monthlyRental).toLocaleString():'—'}</td>
-                    <td style={{padding:'10px 12px'}}>{row.monthlySales?'RM '+Number(row.monthlySales).toLocaleString():'—'}</td>
-                    <td style={{padding:'10px 12px',color:C.sub}}>{row.leaseExpiry||'—'}</td>
-                    <td style={{padding:'10px 12px',color:C.sub}}>{row.franchisee||'—'}</td>
-                  </tr>
-                ))}
-              </tbody>
+              ))}</tbody>
             </table>
           </div>
         </div>
@@ -424,20 +402,19 @@ function ImportView({ onImported, showToast, isLive }) {
   )
 }
 
-// ─── Outlet Form ──────────────────────────────────────────────────
 function OutletForm({ initial, onSave, onCancel, saving }) {
-  const [form, setForm] = useState({...initial})
-  const set = (k,v) => setForm(f=>({...f,[k]:v}))
-  const inp = { background:'#fff', border:`1px solid ${C.border}`, color:C.text, padding:'9px 13px', borderRadius:9, fontSize:14, outline:'none', width:'100%', boxSizing:'border-box' }
+  const [form,setForm]=useState({...initial})
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}))
+  const inp={background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none',width:'100%',boxSizing:'border-box'}
 
-  function Field({ k, l, type, opts, textarea, full }) {
-    const val = form[k]??''
-    const el = opts
-      ? <select value={val} onChange={e=>set(k,e.target.value)} style={inp}><option value=''>— Select —</option>{opts.map(o=><option key={o}>{o}</option>)}</select>
-      : textarea
-        ? <textarea value={val} onChange={e=>set(k,e.target.value)} rows={3} style={{...inp,resize:'vertical'}}/>
-        : <input type={type||'text'} value={val} onChange={e=>set(k,e.target.value)} style={inp}/>
-    return (
+  function Field({k,l,type,opts,textarea,full}){
+    const val=form[k]??''
+    const el=opts
+      ?<select value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} style={inp}><option value=''>— Select —</option>{opts.map(o=><option key={o}>{o}</option>)}</select>
+      :textarea
+        ?<textarea value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} rows={3} style={{...inp,resize:'vertical'}}/>
+        :<input type={type||'text'} value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} style={inp}/>
+    return(
       <div style={{gridColumn:full?'1/-1':'auto'}}>
         <label style={{fontSize:12,color:C.sub,fontWeight:700,display:'block',marginBottom:5,letterSpacing:0.3}}>{l.toUpperCase()}</label>
         {el}
@@ -445,9 +422,9 @@ function OutletForm({ initial, onSave, onCancel, saving }) {
     )
   }
 
-  return (
+  return(
     <div>
-      {FORM_SECTIONS.map(sec => (
+      {FORM_SECTIONS.map(sec=>(
         <div key={sec.title} style={{marginBottom:22}}>
           <div style={{fontSize:12,color:C.accent,fontWeight:700,letterSpacing:2,marginBottom:12,paddingBottom:6,borderBottom:`2px solid ${C.accentBg}`}}>{sec.title.toUpperCase()}</div>
           <div style={{display:'grid',gridTemplateColumns:`repeat(${sec.cols},1fr)`,gap:12}}>
@@ -465,149 +442,162 @@ function OutletForm({ initial, onSave, onCancel, saving }) {
   )
 }
 
-// ─── Main App ─────────────────────────────────────────────────────
 export default function App() {
-  const [outlets,    setOutlets]    = useState([])
-  const [isLive,     setIsLive]     = useState(false)
-  const [ready,      setReady]      = useState(false)
-  const [view,       setView]       = useState('dashboard')
-  const [toast,      setToast]      = useState({msg:'',type:''})
-  const [filterBrand,setFilterBrand]= useState('All Brands')
+  const saved=sessionStorage.getItem('loob_role')
+  const [role,setRole]=useState(saved||null)
+  if(!role) return <LoginScreen onLogin={setRole}/>
+  return <AppContent role={role} onLogout={()=>{sessionStorage.clear();setRole(null)}}/>
+}
+
+function AppContent({ role, onLogout }) {
+  const [outlets,setOutlets]=useState([])
+  const [isLive,setIsLive]=useState(false)
+  const [ready,setReady]=useState(false)
+  const [view,setView]=useState('dashboard')
+  const [toast,setToast]=useState({msg:'',type:''})
+  const [filterBrand,setFilterBrand]=useState('All Brands')
   const [filterStatus,setFilterStatus]=useState('All')
-  const [search,     setSearch]     = useState('')
-  const [sortK,      setSortK]      = useState('outletCode')
-  const [sortAsc,    setSortAsc]    = useState(true)
-  const [expanded,   setExpanded]   = useState(null)
-  const [editing,    setEditing]    = useState(null)
-  const [delTarget,  setDelTarget]  = useState(null)
-  const [saving,     setSaving]     = useState(false)
-  const [alertsOnly, setAlertsOnly] = useState(false)
+  const [search,setSearch]=useState('')
+  const [sortK,setSortK]=useState('outletCode')
+  const [sortAsc,setSortAsc]=useState(true)
+  const [expanded,setExpanded]=useState(null)
+  const [editing,setEditing]=useState(null)
+  const [delTarget,setDelTarget]=useState(null)
+  const [saving,setSaving]=useState(false)
+  const [alertsOnly,setAlertsOnly]=useState(false)
+  const isAdmin=role==='admin'
 
-  const toast$ = (msg,type='success') => { setToast({msg,type}); if(type!=='loading') setTimeout(()=>setToast({msg:'',type:''}),3500) }
+  const toast$=(msg,type='success')=>{setToast({msg,type});if(type!=='loading')setTimeout(()=>setToast({msg:'',type:''}),3500)}
 
-  const load = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}?order=outlet_code.asc`,{headers:{...HDR,'Prefer':''},signal:AbortSignal.timeout(5000)})
-      if (!res.ok) throw new Error()
-      setOutlets((await res.json()).map(fromDB)); setIsLive(true)
-    } catch { setOutlets(MOCK); setIsLive(false) }
-    finally { setReady(true) }
+  const load=useCallback(async()=>{
+    try{
+      const res=await fetch(`${API}?order=outlet_code.asc`,{headers:{...HDR,'Prefer':''},signal:AbortSignal.timeout(5000)})
+      if(!res.ok)throw new Error()
+      setOutlets((await res.json()).map(fromDB));setIsLive(true)
+    }catch{setOutlets(MOCK);setIsLive(false)}
+    finally{setReady(true)}
   },[])
 
-  useEffect(()=>{ load() },[load])
+  useEffect(()=>{load()},[load])
 
-  const filtered = useMemo(()=>{
-    let d = [...outlets]
-    if (filterBrand!=='All Brands') d=d.filter(o=>o.brand===filterBrand)
-    if (filterStatus!=='All') d=d.filter(o=>o.status===filterStatus)
-    if (search) d=d.filter(o=>[o.outletCode,o.outletName,o.state,o.franchisee,o.outletAddress,o.landlordName,o.notes].join(' ').toLowerCase().includes(search.toLowerCase()))
-    if (alertsOnly) d=d.filter(o=>{const ld=days(o.leaseExpiry),hd=days(o.halalExpiry);return(ld!==null&&ld<120)||(hd!==null&&hd<120)})
+  const filtered=useMemo(()=>{
+    let d=[...outlets]
+    if(filterBrand!=='All Brands')d=d.filter(o=>o.brand===filterBrand)
+    if(filterStatus!=='All')d=d.filter(o=>o.status===filterStatus)
+    if(search)d=d.filter(o=>[o.outletCode,o.outletName,o.state,o.franchisee,o.outletAddress,o.landlordName,o.notes].join(' ').toLowerCase().includes(search.toLowerCase()))
+    if(alertsOnly)d=d.filter(o=>{const ld=days(o.leaseExpiry),hd=days(o.halalExpiry);return(ld!==null&&ld<120)||(hd!==null&&hd<120)})
     d.sort((a,b)=>{let av=a[sortK]??'',bv=b[sortK]??'';if(typeof av==='string')av=av.toLowerCase();if(typeof bv==='string')bv=bv.toLowerCase();return sortAsc?(av>bv?1:-1):(av<bv?1:-1)})
     return d
   },[outlets,filterBrand,filterStatus,search,sortK,sortAsc,alertsOnly])
 
-  const stats = useMemo(()=>{
-    const ac = outlets.filter(o=>o.status==='Active')
-    const sales  = ac.reduce((s,o)=>s+(Number(o.monthlySales)||0),0)
-    const rental = ac.reduce((s,o)=>s+(Number(o.monthlyRental)||0),0)
-    const deps   = outlets.reduce((s,o)=>s+dep(o),0)
-    const avgRS  = sales ? ((rental/sales)*100).toFixed(1) : 0
-    const alerts = outlets.filter(o=>{const ld=days(o.leaseExpiry),hd=days(o.halalExpiry);return(ld!==null&&ld<120)||(hd!==null&&hd<120)}).length
-    return { total:outlets.length, active:ac.length, sales, rental, deps, avgRS, alerts }
+  const stats=useMemo(()=>{
+    const ac=outlets.filter(o=>o.status==='Active')
+    const sales=ac.reduce((s,o)=>s+(Number(o.monthlySales)||0),0)
+    const rental=ac.reduce((s,o)=>s+(Number(o.monthlyRental)||0),0)
+    const deps=outlets.reduce((s,o)=>s+dep(o),0)
+    const avgRS=sales?((rental/sales)*100).toFixed(1):0
+    const alerts=outlets.filter(o=>{const ld=days(o.leaseExpiry),hd=days(o.halalExpiry);return(ld!==null&&ld<120)||(hd!==null&&hd<120)}).length
+    return{total:outlets.length,active:ac.length,sales,rental,deps,avgRS,alerts}
   },[outlets])
 
-  function sortBy(k) { if(sortK===k) setSortAsc(!sortAsc); else { setSortK(k); setSortAsc(true) } }
+  function sortBy(k){if(sortK===k)setSortAsc(!sortAsc);else{setSortK(k);setSortAsc(true)}}
 
-  async function save(data) {
-    setSaving(true); toast$('Saving...','loading')
-    try {
-      if (isLive) {
-        if (data.id) {
-          const res = await fetch(`${API}?id=eq.${data.id}`,{method:'PATCH',headers:HDR,body:JSON.stringify(toDB(data))})
-          if (!res.ok) throw new Error(await res.text())
-          const updated = fromDB((await res.json())[0])
+  async function save(data){
+    setSaving(true);toast$('Saving...','loading')
+    try{
+      if(isLive){
+        if(data.id){
+          const res=await fetch(`${API}?id=eq.${data.id}`,{method:'PATCH',headers:HDR,body:JSON.stringify(toDB(data))})
+          if(!res.ok)throw new Error(await res.text())
+          const updated=fromDB((await res.json())[0])
           setOutlets(p=>p.map(o=>o.id===data.id?updated:o))
-        } else {
-          const res = await fetch(API,{method:'POST',headers:HDR,body:JSON.stringify(toDB(data))})
-          if (!res.ok) throw new Error(await res.text())
-          const created = fromDB((await res.json())[0])
-   setOutlets(p=>[...p,created])
+        }else{
+          const res=await fetch(API,{method:'POST',headers:HDR,body:JSON.stringify(toDB(data))})
+          if(!res.ok)throw new Error(await res.text())
+          const created=fromDB((await res.json())[0])
+          setOutlets(p=>[...p,created])
         }
-      } else {
-        if (data.id) setOutlets(p=>p.map(o=>o.id===data.id?data:o))
+      }else{
+        if(data.id)setOutlets(p=>p.map(o=>o.id===data.id?data:o))
         else setOutlets(p=>[...p,{...data,id:Date.now()}])
       }
       toast$(data.id?'Outlet updated':'Outlet created')
       setEditing(null)
-    } catch(e) { toast$('Save failed: '+e.message,'error') }
-    finally { setSaving(false) }
+    }catch(e){toast$('Save failed: '+e.message,'error')}
+    finally{setSaving(false)}
   }
 
-  async function confirmDelete() {
-    const id = delTarget.id; toast$('Deleting...','loading')
-    try {
-      if (isLive) { const res=await fetch(`${API}?id=eq.${id}`,{method:'DELETE',headers:{...HDR,'Prefer':''}}); if(!res.ok) throw new Error(await res.text()) }
-      setOutlets(p=>p.filter(o=>o.id!==id)); toast$('Outlet deleted')
-    } catch(e) { toast$('Delete failed: '+e.message,'error') }
-    finally { setDelTarget(null) }
+  async function confirmDelete(){
+    const id=delTarget.id;toast$('Deleting...','loading')
+    try{
+      if(isLive){const res=await fetch(`${API}?id=eq.${id}`,{method:'DELETE',headers:{...HDR,'Prefer':''}});if(!res.ok)throw new Error(await res.text())}
+      setOutlets(p=>p.filter(o=>o.id!==id));toast$('Outlet deleted')
+    }catch(e){toast$('Delete failed: '+e.message,'error')}
+    finally{setDelTarget(null)}
   }
 
-  function exportCSV() {
-    const keys = ['outletCode','outletFormat','brand','outletName','state','type','model','status','openingDate','closureDate','storeSize','sqft','storageSizeSqft','lat','lng','outletAddress','storageAddress','monthlyRental','monthlySales','atv','gto','serviceCharge','apFees','securityDeposit','utilitiesDeposit','mailboxDeposit','fitoutDeposit','restorationDeposit','leaseExpiry','halalExpiry','lad','ladRemarks','landlordName','tenantName','franchisee','contact','notes']
-    const hdrs = ['Outlet Code','Format','Brand','Outlet Name','State','Type','Model','Status','Opening Date','Closure Date','Store Size','Sqft','Storage Sqft','Lat','Lng','Outlet Address','Storage Address','Monthly Rental','Monthly Sales','ATV','GTO','Service Charge','A&P Fees','Security Deposit','Utilities Deposit','Mailbox Deposit','Fitout Deposit','Restoration Deposit','Lease Expiry','Halal Expiry','LAD','LAD Remarks','Landlord','Tenant','Franchisee','Contact','Notes']
-    const rows = filtered.map(o=>[...keys.map(k=>o[k]??''), rsr(o.monthlyRental,o.monthlySales)??''])
-    const csv  = [[...hdrs,'R/S Ratio (%)'],...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n')
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}))
-    a.download = `loob_outlets_${new Date().toISOString().slice(0,10)}.csv`
-    a.click(); toast$('CSV exported')
+  function exportCSV(){
+    const keys=['outletCode','outletFormat','brand','outletName','state','type','model','status','openingDate','closureDate','storeSize','sqft','storageSizeSqft','lat','lng','outletAddress','storageAddress','monthlyRental','monthlySales','atv','gto','serviceCharge','apFees','securityDeposit','utilitiesDeposit','mailboxDeposit','fitoutDeposit','restorationDeposit','leaseExpiry','halalExpiry','lad','ladRemarks','landlordName','tenantName','franchisee','contact','notes']
+    const hdrs=['Outlet Code','Format','Brand','Outlet Name','State','Type','Model','Status','Opening Date','Closure Date','Store Size','Sqft','Storage Sqft','Lat','Lng','Outlet Address','Storage Address','Monthly Rental','Monthly Sales','ATV','GTO','Service Charge','A&P Fees','Security Deposit','Utilities Deposit','Mailbox Deposit','Fitout Deposit','Restoration Deposit','Lease Expiry','Halal Expiry','LAD','LAD Remarks','Landlord','Tenant','Franchisee','Contact','Notes']
+    const rows=filtered.map(o=>[...keys.map(k=>o[k]??''),rsr(o.monthlyRental,o.monthlySales)??''])
+    const csv=[[...hdrs,'R/S Ratio (%)'],...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n')
+    const a=document.createElement('a')
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}))
+    a.download=`loob_outlets_${new Date().toISOString().slice(0,10)}.csv`
+    a.click();toast$('CSV exported')
   }
 
-  // shared table styles
-  const TH = { padding:'11px 14px', textAlign:'left', color:C.sub, fontWeight:700, fontSize:13, whiteSpace:'nowrap', borderBottom:`2px solid ${C.border}`, background:'#F8FAFC' }
-  const TD = { padding:'11px 14px', fontSize:14, verticalAlign:'middle', borderBottom:`1px solid ${C.border}` }
+  const TH={padding:'11px 14px',textAlign:'left',color:C.sub,fontWeight:700,fontSize:13,whiteSpace:'nowrap',borderBottom:`2px solid ${C.border}`,background:'#F8FAFC'}
+  const TD={padding:'11px 14px',fontSize:14,verticalAlign:'middle',borderBottom:`1px solid ${C.border}`}
 
-  if (!ready) return (
-    <div style={{background:C.bg,minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,Segoe UI,sans-serif'}}>
+  if(!ready)return(
+    <div style={{background:C.bg,minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,sans-serif'}}>
       <div style={{textAlign:'center',color:C.sub}}><div style={{fontSize:40,marginBottom:10}}>⟳</div><div style={{fontSize:16}}>Loading...</div></div>
     </div>
   )
 
-  return (
+  return(
     <div style={{fontFamily:'Inter,"Segoe UI",sans-serif',background:C.bg,minHeight:'100vh',color:C.text,display:'flex',fontSize:14}}>
       <Toast msg={toast.msg} type={toast.type}/>
-      {delTarget && <DelModal outlet={delTarget} onConfirm={confirmDelete} onCancel={()=>setDelTarget(null)}/>}
+      {delTarget&&<DelModal outlet={delTarget} onConfirm={confirmDelete} onCancel={()=>setDelTarget(null)}/>}
 
-      {/* ── SIDEBAR ── */}
+      {/* SIDEBAR */}
       <div style={{width:230,background:C.white,borderRight:`1px solid ${C.border}`,display:'flex',flexDirection:'column',padding:'24px 0',flexShrink:0,boxShadow:'2px 0 8px rgba(0,0,0,0.04)'}}>
         <div style={{padding:'0 20px 28px'}}>
           <div style={{fontSize:10,letterSpacing:3,color:C.sub,fontWeight:700,marginBottom:5}}>LOOB HOLDING</div>
           <div style={{fontSize:20,fontWeight:800,color:C.text,lineHeight:1.3}}>Outlet<br/>Manager</div>
           <div style={{marginTop:8,display:'flex',alignItems:'center',gap:6}}>
             <div style={{width:8,height:8,borderRadius:99,background:isLive?C.green:C.amber}}/>
-            <span style={{fontSize:12,color:C.sub,fontWeight:500}}>{isLive?'Live · Supabase':'Preview mode'}</span>
+            <span style={{fontSize:12,color:C.sub}}>{isLive?'Live · Supabase':'Preview mode'}</span>
+          </div>
+          <div style={{marginTop:6}}>
+            <span style={{background:isAdmin?C.accentBg:C.greenBg,color:isAdmin?C.accent:C.green,fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:99}}>
+              {isAdmin?'Admin':'Viewer'}
+            </span>
           </div>
         </div>
-        {NAV.map(n=>(
-          <button key={n.key} onClick={()=>setView(n.key)} style={{background:view===n.key?C.accentBg:'transparent',border:'none',borderLeft:view===n.key?`3px solid ${C.accent}`:'3px solid transparent',color:view===n.key?C.accent:C.sub,padding:'13px 20px',textAlign:'left',cursor:'pointer',fontSize:15,fontWeight:view===n.key?700:500,display:'flex',alignItems:'center',gap:10,transition:'all 0.1s'}}>
+
+        {NAV.filter(n=>!n.adminOnly||isAdmin).map(n=>(
+          <button key={n.key} onClick={()=>setView(n.key)} style={{background:view===n.key?C.accentBg:'transparent',border:'none',borderLeft:view===n.key?`3px solid ${C.accent}`:'3px solid transparent',color:view===n.key?C.accent:C.sub,padding:'13px 20px',textAlign:'left',cursor:'pointer',fontSize:15,fontWeight:view===n.key?700:500,display:'flex',alignItems:'center',gap:10}}>
             <span style={{fontSize:16}}>{n.icon}</span>
             {n.label}
             {n.key==='import'&&<span style={{marginLeft:'auto',background:C.accent,color:'#fff',fontSize:10,fontWeight:700,padding:'2px 7px',borderRadius:99}}>NEW</span>}
           </button>
         ))}
+
         <div style={{marginTop:'auto',padding:'0 16px'}}>
-          <button onClick={load} style={{width:'100%',background:'#fff',border:`1px solid ${C.border}`,color:C.sub,padding:'9px',borderRadius:9,cursor:'pointer',fontSize:13,marginBottom:12}}>↺ Refresh</button>
-          {stats.alerts>0&&<div style={{background:C.redBg,border:`1px solid #FCA5A5`,borderRadius:10,padding:'11px 14px',fontSize:14,marginBottom:12}}><div style={{color:C.red,fontWeight:700}}>⚠ {stats.alerts} Alerts</div><div style={{color:C.red,opacity:0.7,fontSize:13,marginTop:2}}>Lease / Halal expiring</div></div>}
-          <div style={{background:C.amberBg,border:`1px solid #FCD34D`,borderRadius:10,padding:'13px 14px'}}>
+          <button onClick={load} style={{width:'100%',background:'#fff',border:`1px solid ${C.border}`,color:C.sub,padding:'9px',borderRadius:9,cursor:'pointer',fontSize:13,marginBottom:10}}>↺ Refresh</button>
+          {stats.alerts>0&&<div style={{background:C.redBg,border:`1px solid #FCA5A5`,borderRadius:10,padding:'11px 14px',fontSize:14,marginBottom:10}}><div style={{color:C.red,fontWeight:700}}>⚠ {stats.alerts} Alerts</div><div style={{color:C.red,opacity:0.7,fontSize:13,marginTop:2}}>Lease / Halal expiring</div></div>}
+          <div style={{background:C.amberBg,border:`1px solid #FCD34D`,borderRadius:10,padding:'13px 14px',marginBottom:10}}>
             <div style={{fontSize:12,color:C.amber,fontWeight:700,marginBottom:3}}>DEPOSITS AT RISK</div>
             <div style={{fontSize:18,fontWeight:800,color:C.amber}}>RM {(stats.deps/1000000).toFixed(2)}M</div>
           </div>
+          <button onClick={onLogout} style={{width:'100%',background:C.redBg,border:`1px solid #FCA5A5`,color:C.red,padding:'9px',borderRadius:9,cursor:'pointer',fontSize:13,fontWeight:600}}>Sign Out</button>
         </div>
       </div>
 
-      {/* ── MAIN ── */}
+      {/* MAIN */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'auto'}}>
-        {/* topbar */}
         <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:'14px 28px',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
           <div>
             <div style={{fontSize:20,fontWeight:800,color:C.text}}>{NAV.find(n=>n.key===view)?.label}</div>
@@ -615,21 +605,21 @@ export default function App() {
           </div>
           <div style={{display:'flex',gap:10}}>
             <button onClick={exportCSV} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 18px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:600}}>↓ Export CSV</button>
-            <button onClick={()=>setEditing({...EMPTY})} style={{background:C.accent,border:'none',color:'#fff',padding:'9px 20px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:700}}>+ Add Outlet</button>
+            {isAdmin&&<button onClick={()=>setEditing({...EMPTY})} style={{background:C.accent,border:'none',color:'#fff',padding:'9px 20px',borderRadius:9,cursor:'pointer',fontSize:14,fontWeight:700}}>+ Add Outlet</button>}
           </div>
         </div>
 
         <div style={{padding:24,flex:1}}>
 
-          {/* ─ DASHBOARD ─ */}
+          {/* DASHBOARD */}
           {view==='dashboard'&&(
             <div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16,marginBottom:20}}>
                 {[
-                  {l:'Total Outlets',   v:stats.total,  sub:`${stats.active} active`,                              c:C.accent},
-                  {l:'Portfolio Sales', v:'RM '+(stats.sales/1000).toFixed(0)+'K/mo', sub:'active outlets only',   c:C.green},
-                  {l:'Avg R/S Ratio',   v:stats.avgRS+'%', sub:parseFloat(stats.avgRS)>15?'Above target':'Within target', c:parseFloat(stats.avgRS)>15?C.red:C.green},
-                  {l:'Compliance Alerts',v:stats.alerts, sub:'expiring within 120 days',                            c:stats.alerts>0?C.amber:C.green},
+                  {l:'Total Outlets',v:stats.total,sub:`${stats.active} active`,c:C.accent},
+                  {l:'Portfolio Sales',v:'RM '+(stats.sales/1000).toFixed(0)+'K/mo',sub:'active outlets only',c:C.green},
+                  {l:'Avg R/S Ratio',v:stats.avgRS+'%',sub:parseFloat(stats.avgRS)>15?'Above target':'Within target',c:parseFloat(stats.avgRS)>15?C.red:C.green},
+                  {l:'Compliance Alerts',v:stats.alerts,sub:'expiring within 120 days',c:stats.alerts>0?C.amber:C.green},
                 ].map(c=>(
                   <div key={c.l} style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:14,padding:'20px 22px',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
                     <div style={{fontSize:12,color:C.sub,letterSpacing:1,fontWeight:700,marginBottom:8}}>{c.l.toUpperCase()}</div>
@@ -640,9 +630,9 @@ export default function App() {
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16,marginBottom:20}}>
                 {[
-                  {l:'Total Monthly Rental', v:fRM(stats.rental)},
-                  {l:'Capital in Deposits',  v:'RM '+(stats.deps/1000000).toFixed(2)+'M', c:C.amber},
-                  {l:'Monthly SC + A&P',     v:fRM(outlets.reduce((s,o)=>s+(Number(o.serviceCharge)||0)+(Number(o.apFees)||0),0))},
+                  {l:'Total Monthly Rental',v:fRM(stats.rental)},
+                  {l:'Capital in Deposits',v:'RM '+(stats.deps/1000000).toFixed(2)+'M',c:C.amber},
+                  {l:'Monthly SC + A&P',v:fRM(outlets.reduce((s,o)=>s+(Number(o.serviceCharge)||0)+(Number(o.apFees)||0),0))},
                 ].map(c=>(
                   <div key={c.l} style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:14,padding:'15px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
                     <div style={{fontSize:14,color:C.sub}}>{c.l}</div>
@@ -673,8 +663,8 @@ export default function App() {
                   {outlets.flatMap(o=>{
                     const items=[]
                     const ld=days(o.leaseExpiry),hd=days(o.halalExpiry)
-                    if(ld!==null&&ld<120) items.push({name:o.outletName,code:o.outletCode,brand:o.brand,type:'Lease',d:ld})
-                    if(hd!==null&&hd<120) items.push({name:o.outletName,code:o.outletCode,brand:o.brand,type:'Halal',d:hd})
+                    if(ld!==null&&ld<120)items.push({name:o.outletName,code:o.outletCode,brand:o.brand,type:'Lease',d:ld})
+                    if(hd!==null&&hd<120)items.push({name:o.outletName,code:o.outletCode,brand:o.brand,type:'Halal',d:hd})
                     return items
                   }).sort((a,b)=>a.d-b.d).slice(0,6).map((a,i)=>(
                     <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 0',borderBottom:`1px solid ${C.border}`}}>
@@ -691,17 +681,13 @@ export default function App() {
             </div>
           )}
 
-          {/* ─ OUTLETS ─ */}
+          {/* OUTLETS */}
           {view==='outlets'&&(
             <div>
               <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center'}}>
-                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder='Search outlet, code, address, landlord...' style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none',width:280}}/>
-                <select value={filterBrand} onChange={e=>setFilterBrand(e.target.value)} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none'}}>
-                  {BRANDS.map(b=><option key={b}>{b}</option>)}
-                </select>
-                <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none'}}>
-                  {STATUSES.map(s=><option key={s}>{s}</option>)}
-                </select>
+                <input value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={stopKey} placeholder='Search outlet, code, address, landlord...' style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none',width:280}}/>
+                <select value={filterBrand} onChange={e=>setFilterBrand(e.target.value)} onKeyDown={stopKey} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none'}}>{BRANDS.map(b=><option key={b}>{b}</option>)}</select>
+                <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)} onKeyDown={stopKey} style={{background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none'}}>{STATUSES.map(s=><option key={s}>{s}</option>)}</select>
                 <button onClick={()=>setAlertsOnly(!alertsOnly)} style={{background:alertsOnly?C.redBg:'#fff',border:`1px solid ${alertsOnly?'#FCA5A5':C.border}`,color:alertsOnly?C.red:C.sub,padding:'9px 14px',borderRadius:9,fontSize:14,fontWeight:600,cursor:'pointer'}}>⚠ Alerts Only</button>
                 <div style={{marginLeft:'auto',color:C.sub,fontSize:14}}>{filtered.length} outlets</div>
               </div>
@@ -713,15 +699,15 @@ export default function App() {
                         {[['outletCode','Code'],['outletFormat','Format'],['brand','Brand'],['outletName','Outlet Name'],['state','State'],['type','Type'],['model','Model'],['status','Status'],['sqft','Sqft'],['monthlyRental','Rental'],['monthlySales','Sales'],['_rs','R/S'],['leaseExpiry','Lease'],['halalExpiry','Halal'],['franchisee','PIC']].map(([k,l])=>(
                           <th key={k} onClick={()=>!k.startsWith('_')&&sortBy(k)} style={{...TH,cursor:'pointer',color:sortK===k?C.accent:C.sub}}>{l}{sortK===k?(sortAsc?' ↑':' ↓'):''}</th>
                         ))}
-                        <th style={TH}>ACTIONS</th>
+                        {isAdmin&&<th style={TH}>ACTIONS</th>}
                       </tr>
                     </thead>
                     <tbody>
                       {filtered.map((o,i)=>{
                         const rs=rsr(o.monthlyRental,o.monthlySales)
-                        const ld=days(o.leaseExpiry), hd=days(o.halalExpiry)
+                        const ld=days(o.leaseExpiry),hd=days(o.halalExpiry)
                         const isExp=expanded===o.id
-                        return [
+                        return[
                           <tr key={o.id} onClick={()=>setExpanded(isExp?null:o.id)} style={{background:isExp?C.accentBg:i%2===0?'#fff':'#FAFBFD',cursor:'pointer'}}>
                             <td style={{...TD,fontFamily:'monospace',color:C.accent,fontWeight:700}}>{o.outletCode}</td>
                             <td style={{...TD,color:C.sub}}>{o.outletFormat||'—'}</td>
@@ -738,16 +724,18 @@ export default function App() {
                             <td style={TD}><DaysBadge d={ld}/></td>
                             <td style={TD}><DaysBadge d={hd}/></td>
                             <td style={{...TD,color:C.sub}}>{o.franchisee||'—'}</td>
-                            <td style={TD} onClick={e=>e.stopPropagation()}>
-                              <div style={{display:'flex',gap:6}}>
-                                <button onClick={()=>setEditing({...o})} style={{background:C.accentBg,border:`1px solid #BFDBFE`,color:C.accent,padding:'5px 12px',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:600}}>Edit</button>
-                                <button onClick={()=>setDelTarget(o)} style={{background:C.redBg,border:`1px solid #FCA5A5`,color:C.red,padding:'5px 12px',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:600}}>Delete</button>
-                              </div>
-                            </td>
+                            {isAdmin&&(
+                              <td style={TD} onClick={e=>e.stopPropagation()}>
+                                <div style={{display:'flex',gap:6}}>
+                                  <button onClick={()=>setEditing({...o})} style={{background:C.accentBg,border:`1px solid #BFDBFE`,color:C.accent,padding:'5px 12px',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:600}}>Edit</button>
+                                  <button onClick={()=>setDelTarget(o)} style={{background:C.redBg,border:`1px solid #FCA5A5`,color:C.red,padding:'5px 12px',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:600}}>Delete</button>
+                                </div>
+                              </td>
+                            )}
                           </tr>,
                           isExp&&(
                             <tr key={o.id+'-x'}>
-                              <td colSpan={16} style={{padding:'18px 20px',background:'#F0F6FF',borderBottom:`1px solid ${C.border}`}}>
+                              <td colSpan={isAdmin?16:15} style={{padding:'18px 20px',background:'#F0F6FF',borderBottom:`1px solid ${C.border}`}}>
                                 <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:14,marginBottom:14}}>
                                   {[['Opening Date',o.openingDate||'—'],['Storage Sqft',o.storageSizeSqft?o.storageSizeSqft+' sqft':'—'],['Coordinates',(o.lat&&o.lng)?`${o.lat}, ${o.lng}`:'—'],['GTO Annual',fRM(o.gto)],['Service Charge',fRM(o.serviceCharge)+'/mo'],['A&P Fees',fRM(o.apFees)+'/mo'],['Security Dep',fRM(o.securityDeposit)],['Utilities Dep',fRM(o.utilitiesDeposit)],['Fitout Dep',fRM(o.fitoutDeposit)],['Restoration Dep',fRM(o.restorationDeposit)],['Mailbox Dep',fRM(o.mailboxDeposit)],['Total Deposits',fRM(dep(o)),true],['Landlord',o.landlordName||'—'],['Tenant',o.tenantName||'—'],['LAD Rate',o.lad||'—']].map(([l,v,hi])=>(
                                     <div key={l}><div style={{fontSize:11,color:C.sub,fontWeight:700,marginBottom:3}}>{l.toUpperCase()}</div><div style={{fontSize:14,color:hi?C.amber:C.text,fontWeight:hi?700:400}}>{v}</div></div>
@@ -772,13 +760,13 @@ export default function App() {
             </div>
           )}
 
-          {/* ─ LEASE ─ */}
+          {/* LEASE */}
           {view==='lease'&&(
             <div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:14,marginBottom:20}}>
                 {[['Security Deposits','securityDeposit'],['Utilities Deposits','utilitiesDeposit'],['Fitout Deposits','fitoutDeposit'],['Restoration Deps','restorationDeposit'],['Mailbox Deposits','mailboxDeposit']].map(([l,k])=>{
                   const t=outlets.reduce((s,o)=>s+(Number(o[k])||0),0)
-                  return <div key={l} style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:12,padding:'16px 18px',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}><div style={{fontSize:12,color:C.sub,fontWeight:700,marginBottom:5}}>{l.toUpperCase()}</div><div style={{fontSize:18,fontWeight:800,color:C.amber}}>RM {(t/1000).toFixed(0)}K</div></div>
+                  return<div key={l} style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:12,padding:'16px 18px',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}><div style={{fontSize:12,color:C.sub,fontWeight:700,marginBottom:5}}>{l.toUpperCase()}</div><div style={{fontSize:18,fontWeight:800,color:C.amber}}>RM {(t/1000).toFixed(0)}K</div></div>
                 })}
               </div>
               <div style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:14,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
@@ -820,13 +808,13 @@ export default function App() {
             </div>
           )}
 
-          {/* ─ COMPLIANCE ─ */}
+          {/* COMPLIANCE */}
           {view==='compliance'&&(
             <div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:20}}>
                 {[[C.red,C.redBg,'Critical (<60 days)'],[C.amber,C.amberBg,'Warning (60–120 days)'],[C.green,C.greenBg,'On Track (>120 days)']].map(([c,bg,l],i)=>{
                   const cnt=outlets.filter(o=>{const mn=Math.min(days(o.leaseExpiry)??9999,days(o.halalExpiry)??9999);return i===0?mn<60:i===1?mn>=60&&mn<120:mn>=120}).length
-                  return <div key={l} style={{background:bg,border:`1px solid ${c}44`,borderRadius:14,padding:'20px 22px'}}><div style={{fontSize:13,color:c,letterSpacing:1,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:36,fontWeight:800,color:c,marginTop:8}}>{cnt}</div></div>
+                  return<div key={l} style={{background:bg,border:`1px solid ${c}44`,borderRadius:14,padding:'20px 22px'}}><div style={{fontSize:13,color:c,letterSpacing:1,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:36,fontWeight:800,color:c,marginTop:8}}>{cnt}</div></div>
                 })}
               </div>
               <div style={{background:'#fff',border:`1px solid ${C.border}`,borderRadius:14,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
@@ -852,7 +840,7 @@ export default function App() {
             </div>
           )}
 
-          {/* ─ PERFORMANCE ─ */}
+          {/* PERFORMANCE */}
           {view==='performance'&&(
             <div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:20}}>
@@ -908,15 +896,15 @@ export default function App() {
             </div>
           )}
 
-          {/* ─ IMPORT ─ */}
-          {view==='import'&&(
-            <ImportView isLive={isLive} showToast={toast$} onImported={rows=>{setOutlets(p=>[...p,...rows]); toast$(rows.length+' outlets imported'); setView('outlets')}}/>
+          {/* IMPORT — admin only */}
+          {view==='import'&&isAdmin&&(
+            <ImportView isLive={isLive} showToast={toast$} onImported={rows=>{setOutlets(p=>[...p,...rows]);toast$(rows.length+' outlets imported');setView('outlets')}}/>
           )}
 
         </div>
       </div>
 
-      {/* ── EDIT MODAL ── */}
+      {/* EDIT MODAL */}
       {editing&&(
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20}}>
           <div style={{background:'#fff',borderRadius:16,width:820,maxHeight:'92vh',overflowY:'auto',padding:28,boxShadow:'0 8px 40px rgba(0,0,0,0.15)'}}>
