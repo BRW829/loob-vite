@@ -236,7 +236,7 @@ function Toast({ msg, type }) {
 
 function DelModal({ outlet, onConfirm, onCancel }) {
   return (
-    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:2000}}>
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:2000}} onKeyDown={e=>e.stopPropagation()}>
       <div style={{background:'#fff',borderRadius:16,padding:32,width:420,textAlign:'center',boxShadow:'0 8px 40px rgba(0,0,0,0.15)'}}>
         <div style={{fontSize:40,marginBottom:12}}>🗑️</div>
         <div style={{fontSize:20,fontWeight:800,color:C.red,marginBottom:8}}>Delete Outlet?</div>
@@ -906,7 +906,7 @@ function AppContent({ role, onLogout }) {
 
       {/* EDIT MODAL */}
       {editing&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20}}>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20}} onKeyDown={e=>e.stopPropagation()}>
           <div style={{background:'#fff',borderRadius:16,width:820,maxHeight:'92vh',overflowY:'auto',padding:28,boxShadow:'0 8px 40px rgba(0,0,0,0.15)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:22}}>
               <div>
