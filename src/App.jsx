@@ -538,24 +538,38 @@ function AppContent({ role, onLogout }) {
   const [delTarget, setDelTarget] = useState(null)
   const [saving, setSaving] = useState(false)
   const [alertsOnly, setAlertsOnly] = useState(false)
-  const [customBrands, setCustomBrands] = useState(() => { try { const s = localStorage.getItem('loob_brands'); return s ? JSON.parse(s) : [] } catch { return [] } })
+  const [customBrands, setCustomBrands] = useState([])
 
   const isAdmin = role === 'admin'
   const allBrands = [...DEFAULT_BRANDS, ...customBrands]
   const allBrandsWithAll = ['All Brands', ...allBrands]
 
-  function addBrand(name) {
+  async function addBrand(name) {
     const n = name.trim()
     if (!n || allBrands.includes(n)) return false
     const updated = [...customBrands, n]
     setCustomBrands(updated)
-    try { localStorage.setItem('loob_brands', JSON.stringify(updated)) } catch {}
+    if (isLive) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/brand_settings?id=eq.1`, {
+          method: 'PATCH', headers: HDR,
+          body: JSON.stringify({ brands: updated })
+        })
+      } catch {}
+    }
     return true
   }
-  function deleteBrand(name) {
+  async function deleteBrand(name) {
     const updated = customBrands.filter(b => b !== name)
     setCustomBrands(updated)
-    try { localStorage.setItem('loob_brands', JSON.stringify(updated)) } catch {}
+    if (isLive) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/brand_settings?id=eq.1`, {
+          method: 'PATCH', headers: HDR,
+          body: JSON.stringify({ brands: updated })
+        })
+      } catch {}
+    }
   }
 
   const toast$ = (msg, type = 'success') => { setToast({ msg, type }); if (type !== 'loading') setTimeout(() => setToast({ msg: '', type: '' }), 3500) }
@@ -564,7 +578,12 @@ function AppContent({ role, onLogout }) {
     try {
       const res = await fetch(`${API}?order=outlet_code.asc`, { headers: { ...HDR, 'Prefer': '' }, signal: AbortSignal.timeout(5000) })
       if (!res.ok) throw new Error()
-      setOutlets((await res.json()).map(fromDB)); setIsLive(true)
+      const data = await res.json(); setOutlets(data.map(fromDB)); setIsLive(true)
+      // Load custom brands
+      try {
+        const br = await fetch(`${SUPABASE_URL}/rest/v1/brand_settings?id=eq.1`, { headers: { ...HDR, 'Prefer': '' } })
+        if (br.ok) { const bd = await br.json(); if (bd[0]?.brands) setCustomBrands(bd[0].brands) }
+      } catch {}
     } catch { setOutlets(MOCK); setIsLive(false) }
     finally { setReady(true) }
   }, [])
