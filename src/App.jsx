@@ -130,7 +130,7 @@ const days = d => !d ? null : Math.ceil((new Date(d)-new Date())/86400000)
 const fRM  = v => (v===''||v===null||v===undefined) ? '—' : 'RM '+Number(v).toLocaleString()
 const dep  = o => [o.securityDeposit,o.utilitiesDeposit,o.mailboxDeposit,o.fitoutDeposit,o.restorationDeposit].reduce((s,v)=>s+(Number(v)||0),0)
 const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g,'')
-const stopKey = e => e.stopPropagation()
+const stopKey = e => { e.stopPropagation(); }
 
 function toDB(o) {
   return {
@@ -402,25 +402,25 @@ function ImportView({ onImported, showToast, isLive }) {
   )
 }
 
+function renderField(f, form, set) {
+  const inp = {background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none',width:'100%',boxSizing:'border-box'}
+  const val = form[f.k]??''
+  const el = f.opts
+    ?<select value={val} onChange={e=>set(f.k,e.target.value)} onKeyDown={stopKey} style={inp}><option value=''>— Select —</option>{f.opts.map(o=><option key={o}>{o}</option>)}</select>
+    :f.textarea
+      ?<textarea value={val} onChange={e=>set(f.k,e.target.value)} onKeyDown={stopKey} rows={3} style={{...inp,resize:'vertical'}}/>
+      :<input type={f.type||'text'} value={val} onChange={e=>set(f.k,e.target.value)} onKeyDown={stopKey} style={inp}/>
+  return(
+    <div key={f.k} style={{gridColumn:f.full?'1/-1':'auto'}}>
+      <label style={{fontSize:12,color:C.sub,fontWeight:700,display:'block',marginBottom:5,letterSpacing:0.3}}>{f.l.toUpperCase()}</label>
+      {el}
+    </div>
+  )
+}
+
 function OutletForm({ initial, onSave, onCancel, saving }) {
   const [form,setForm]=useState({...initial})
   const set=(k,v)=>setForm(f=>({...f,[k]:v}))
-  const inp={background:'#fff',border:`1px solid ${C.border}`,color:C.text,padding:'9px 13px',borderRadius:9,fontSize:14,outline:'none',width:'100%',boxSizing:'border-box'}
-
-  function Field({k,l,type,opts,textarea,full}){
-    const val=form[k]??''
-    const el=opts
-      ?<select value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} style={inp}><option value=''>— Select —</option>{opts.map(o=><option key={o}>{o}</option>)}</select>
-      :textarea
-        ?<textarea value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} rows={3} style={{...inp,resize:'vertical'}}/>
-        :<input type={type||'text'} value={val} onChange={e=>set(k,e.target.value)} onKeyDown={stopKey} style={inp}/>
-    return(
-      <div style={{gridColumn:full?'1/-1':'auto'}}>
-        <label style={{fontSize:12,color:C.sub,fontWeight:700,display:'block',marginBottom:5,letterSpacing:0.3}}>{l.toUpperCase()}</label>
-        {el}
-      </div>
-    )
-  }
 
   return(
     <div>
@@ -428,7 +428,7 @@ function OutletForm({ initial, onSave, onCancel, saving }) {
         <div key={sec.title} style={{marginBottom:22}}>
           <div style={{fontSize:12,color:C.accent,fontWeight:700,letterSpacing:2,marginBottom:12,paddingBottom:6,borderBottom:`2px solid ${C.accentBg}`}}>{sec.title.toUpperCase()}</div>
           <div style={{display:'grid',gridTemplateColumns:`repeat(${sec.cols},1fr)`,gap:12}}>
-            {sec.fields.map(f=><Field key={f.k} k={f.k} l={f.l} type={f.type} opts={f.opts} textarea={f.textarea} full={f.full}/>)}
+            {sec.fields.map(f=>renderField(f,form,set))}
           </div>
         </div>
       ))}
@@ -906,8 +906,8 @@ function AppContent({ role, onLogout }) {
 
       {/* EDIT MODAL */}
       {editing&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20}} onKeyDown={e=>e.stopPropagation()}>
-          <div style={{background:'#fff',borderRadius:16,width:820,maxHeight:'92vh',overflowY:'auto',padding:28,boxShadow:'0 8px 40px rgba(0,0,0,0.15)'}}>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.35)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20}} onKeyDown={e=>e.stopPropagation()} onClick={e=>e.target===e.currentTarget&&setEditing(null)}>
+          <div tabIndex={-1} style={{background:'#fff',borderRadius:16,width:820,maxHeight:'92vh',overflowY:'auto',padding:28,boxShadow:'0 8px 40px rgba(0,0,0,0.15)'}} onKeyDown={e=>e.stopPropagation()}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:22}}>
               <div>
                 <div style={{fontSize:18,fontWeight:800,color:C.text}}>{editing.id?'Edit Outlet':'New Outlet'}</div>
