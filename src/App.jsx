@@ -690,10 +690,21 @@ function AppContent({ role, onLogout }) {
         <div style={{ marginTop: 'auto', padding: '0 16px' }}>
           <button onClick={load} style={{ width: '100%', background: '#fff', border: `1px solid ${C.border}`, color: C.sub, padding: '9px', borderRadius: 9, cursor: 'pointer', fontSize: 13, marginBottom: 10 }}>↺ Refresh</button>
           {stats.alerts > 0 && <div style={{ background: C.redBg, border: `1px solid #FCA5A5`, borderRadius: 10, padding: '11px 14px', fontSize: 14, marginBottom: 10 }}><div style={{ color: C.red, fontWeight: 700 }}>⚠ {stats.alerts} Alerts</div><div style={{ color: C.red, opacity: 0.7, fontSize: 13, marginTop: 2 }}>Lease / Halal expiring</div></div>}
-          <div style={{ background: C.amberBg, border: `1px solid #FCD34D`, borderRadius: 10, padding: '13px 14px', marginBottom: 10 }}>
-            <div style={{ fontSize: 12, color: C.amber, fontWeight: 700, marginBottom: 3 }}>DEPOSITS AT RISK</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.amber }}>RM {(stats.deps / 1000000).toFixed(2)}M</div>
-          </div>
+          {(() => {
+            const expiring30 = outlets.filter(o => { const d = days(o.leaseExpiry); return d !== null && d >= 0 && d <= 30 }).length
+            const expiring90 = outlets.filter(o => { const d = days(o.leaseExpiry); return d !== null && d > 30 && d <= 90 }).length
+            const expired = outlets.filter(o => { const d = days(o.leaseExpiry); return d !== null && d < 0 }).length
+            return (
+              <div style={{ background: '#F8FAFC', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
+                <div style={{ fontSize: 11, color: C.sub, fontWeight: 700, marginBottom: 8, letterSpacing: 1 }}>LEASE EXPIRY STATUS</div>
+                {expired > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}><span style={{ fontSize: 13, color: C.red, fontWeight: 600 }}>🔴 Expired</span><span style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{expired}</span></div>}
+                {expiring30 > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}><span style={{ fontSize: 13, color: C.red, fontWeight: 600 }}>⚠ Within 30d</span><span style={{ fontSize: 13, fontWeight: 700, color: C.red }}>{expiring30}</span></div>}
+                {expiring90 > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}><span style={{ fontSize: 13, color: C.amber, fontWeight: 600 }}>⏰ Within 90d</span><span style={{ fontSize: 13, fontWeight: 700, color: C.amber }}>{expiring90}</span></div>}
+                {expired === 0 && expiring30 === 0 && expiring90 === 0 && <div style={{ fontSize: 12, color: C.green, fontWeight: 600 }}>✓ All leases on track</div>}
+                <button onClick={() => { setView('compliance') }} style={{ width: '100%', background: '#fff', border: `1px solid ${C.border}`, color: C.sub, padding: '6px', borderRadius: 7, cursor: 'pointer', fontSize: 11, marginTop: 8 }}>View Compliance →</button>
+              </div>
+            )
+          })()}
           {isAdmin && <BrandManager allBrands={allBrands} customBrands={customBrands} onAdd={addBrand} onDelete={deleteBrand} />}
           <button onClick={onLogout} style={{ width: '100%', background: C.redBg, border: `1px solid #FCA5A5`, color: C.red, padding: '9px', borderRadius: 9, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Sign Out</button>
         </div>
