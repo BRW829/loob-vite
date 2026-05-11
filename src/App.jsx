@@ -606,7 +606,7 @@ function AppContent({ role, onLogout }) {
     const rental = ac.reduce((s, o) => s + (Number(o.monthlyGrossRent) || Number(o.monthlyRental) || 0), 0)
     const deps = outlets.reduce((s, o) => s + dep(o), 0)
     const avgRS = sales ? ((rental / sales) * 100).toFixed(1) : 0
-    const alerts = outlets.filter(o => { const ld = days(o.leaseExpiry); return (ld !== null && ld < 120) || (hd !== null && hd < 120) }).length
+    const alerts = outlets.filter(o => { const ld = days(o.leaseExpiry), sd = days(o.storageLeaseExpiry); return (ld !== null && ld < 120) || (sd !== null && sd < 120) }).length
     return { total: outlets.length, active: ac.length, sales, rental, deps, avgRS, alerts }
   }, [outlets])
 
