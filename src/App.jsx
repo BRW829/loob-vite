@@ -40,7 +40,7 @@ const EMPTY = {
   serviceCharge: '', apFees: '',
   securityDeposit: '', utilitiesDeposit: '', mailboxDeposit: '',
   fitoutDeposit: '', restorationDeposit: '', otherDeposit: '', otherDepositRemark: '',
-  leaseExpiry: '', halalExpiry: '', lad: '', ladRemarks: '',
+  leaseExpiry: '', storageLeaseExpiry: '', halalExpiry: '', lad: '', ladRemarks: '',
   landlordName: '', tenantName: '', franchisee: '', contact: '', notes: '',
 }
 
@@ -97,7 +97,8 @@ const FORM_SECTIONS = [
   },
   {
     title: 'Lease & Legal', cols: 2, fields: [
-      { k: 'leaseExpiry', l: 'Lease Expiry', type: 'date' },
+      { k: 'leaseExpiry', l: 'Outlet Lease Expiry', type: 'date' },
+      { k: 'storageLeaseExpiry', l: 'Storage Lease Expiry', type: 'date' },
       { k: 'halalExpiry', l: 'Halal Cert Expiry', type: 'date' },
       { k: 'landlordName', l: 'Landlord Name' },
       { k: 'tenantName', l: 'Tenant Name' },
@@ -130,7 +131,7 @@ const DB_FIELDS = [
   { key: 'mailboxDeposit', label: 'Mailbox Deposit' }, { key: 'fitoutDeposit', label: 'Fitout Deposit' },
   { key: 'restorationDeposit', label: 'Restoration Deposit' }, { key: 'otherDeposit', label: 'Other Deposit' },
   { key: 'otherDepositRemark', label: 'Other Deposit Remark' },
-  { key: 'leaseExpiry', label: 'Lease Expiry' }, { key: 'halalExpiry', label: 'Halal Expiry' },
+  { key: 'leaseExpiry', label: 'Outlet Lease Expiry' }, { key: 'storageLeaseExpiry', label: 'Storage Lease Expiry' }, { key: 'halalExpiry', label: 'Halal Expiry' },
   { key: 'lad', label: 'LAD Rate' }, { key: 'ladRemarks', label: 'LAD Remarks' },
   { key: 'landlordName', label: 'Landlord Name' }, { key: 'tenantName', label: 'Tenant Name' },
   { key: 'franchisee', label: 'Franchisee / PIC' }, { key: 'contact', label: 'Contact' }, { key: 'notes', label: 'Notes' },
@@ -167,7 +168,7 @@ function toDB(o) {
     mailbox_deposit: o.mailboxDeposit || null, fitout_deposit: o.fitoutDeposit || null,
     restoration_deposit: o.restorationDeposit || null,
     other_deposit: o.otherDeposit || null, other_deposit_remark: o.otherDepositRemark || null,
-    lease_expiry: o.leaseExpiry || null, halal_expiry: o.halalExpiry || null,
+    lease_expiry: o.leaseExpiry || null, storage_lease_expiry: o.storageLeaseExpiry || null, halal_expiry: o.halalExpiry || null,
     lad: o.lad, lad_remarks: o.ladRemarks, landlord_name: o.landlordName, tenant_name: o.tenantName,
     franchisee: o.franchisee, contact: o.contact, notes: o.notes,
   }
@@ -188,7 +189,7 @@ function fromDB(r) {
     mailboxDeposit: r.mailbox_deposit || '', fitoutDeposit: r.fitout_deposit || '',
     restorationDeposit: r.restoration_deposit || '',
     otherDeposit: r.other_deposit || '', otherDepositRemark: r.other_deposit_remark || '',
-    leaseExpiry: r.lease_expiry || '', halalExpiry: r.halal_expiry || '',
+    leaseExpiry: r.lease_expiry || '', storageLeaseExpiry: r.storage_lease_expiry || '', halalExpiry: r.halal_expiry || '',
     lad: r.lad || '', ladRemarks: r.lad_remarks || '',
     landlordName: r.landlord_name || '', tenantName: r.tenant_name || '',
     franchisee: r.franchisee || '', contact: r.contact || '', notes: r.notes || '',
@@ -595,7 +596,7 @@ function AppContent({ role, onLogout }) {
     if (filterBrand !== 'All Brands') d = d.filter(o => o.brand === filterBrand)
     if (filterStatus !== 'All') d = d.filter(o => o.status === filterStatus)
     if (search) d = d.filter(o => [o.outletCode, o.outletName, o.state, o.franchisee, o.outletAddress, o.landlordName, o.notes].join(' ').toLowerCase().includes(search.toLowerCase()))
-    if (alertsOnly) d = d.filter(o => { const ld = days(o.leaseExpiry), hd = days(o.halalExpiry); return (ld !== null && ld < 120) || (hd !== null && hd < 120) })
+    if (alertsOnly) d = d.filter(o => { const ld = days(o.leaseExpiry), sd = days(o.storageLeaseExpiry), hd = days(o.halalExpiry); return (ld !== null && ld < 120) || (sd !== null && sd < 120) || (hd !== null && hd < 120) })
     d.sort((a, b) => { let av = a[sortK] ?? '', bv = b[sortK] ?? ''; if (typeof av === 'string') av = av.toLowerCase(); if (typeof bv === 'string') bv = bv.toLowerCase(); return sortAsc ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1) })
     return d
   }, [outlets, filterBrand, filterStatus, search, sortK, sortAsc, alertsOnly])
@@ -854,6 +855,7 @@ function AppContent({ role, onLogout }) {
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14, marginBottom: 14 }}>
                                   {[
                                     ['Opening Date', o.openingDate || '—'],
+                                    ['Storage Lease Expiry', o.storageLeaseExpiry || '—'],
                                     ['Storage Sqft', o.storageSizeSqft ? o.storageSizeSqft + ' sqft' : '—'],
                                     ['Coordinates', (o.lat && o.lng) ? `${o.lat}, ${o.lng}` : '—'],
                                     ['GTO %', o.gto ? o.gto + '%' : '—'],
@@ -956,9 +958,9 @@ function AppContent({ role, onLogout }) {
               </div>
               <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead><tr>{['Code', 'Brand', 'Outlet', 'State', 'Lease Expiry', 'Lease', 'Halal Expiry', 'Halal', 'Status'].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <thead><tr>{['Code', 'Brand', 'Outlet', 'State', 'Outlet Lease', 'Outlet Lease', 'Storage Lease', 'Storage Lease', 'Halal Expiry', 'Halal', 'Status'].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
                   <tbody>
-                    {[...outlets].sort((a, b) => Math.min(days(a.leaseExpiry) ?? 9999, days(a.halalExpiry) ?? 9999) - Math.min(days(b.leaseExpiry) ?? 9999, days(b.halalExpiry) ?? 9999)).map((o, i) => (
+                    {[...outlets].sort((a, b) => Math.min(days(a.leaseExpiry) ?? 9999, days(a.storageLeaseExpiry) ?? 9999, days(a.halalExpiry) ?? 9999) - Math.min(days(b.leaseExpiry) ?? 9999, days(b.storageLeaseExpiry) ?? 9999, days(b.halalExpiry) ?? 9999)).map((o, i) => (
                       <tr key={o.id} style={{ background: i % 2 === 0 ? '#fff' : '#FAFBFD' }}>
                         <td style={{ ...TD, fontFamily: 'monospace', color: C.accent, fontWeight: 700 }}>{o.outletCode}</td>
                         <td style={TD}><span style={{ color: BRAND_COLOR[o.brand] || C.text, fontWeight: 700, fontSize: 13 }}>{o.brand}</span></td>
@@ -966,6 +968,8 @@ function AppContent({ role, onLogout }) {
                         <td style={{ ...TD, color: C.sub }}>{o.state}</td>
                         <td style={{ ...TD, color: C.sub }}>{o.leaseExpiry || '—'}</td>
                         <td style={TD}><DaysBadge d={days(o.leaseExpiry)} /></td>
+                        <td style={{ ...TD, color: C.sub }}>{o.storageLeaseExpiry || '—'}</td>
+                        <td style={TD}><DaysBadge d={days(o.storageLeaseExpiry)} /></td>
                         <td style={{ ...TD, color: C.sub }}>{o.halalExpiry || '—'}</td>
                         <td style={TD}><DaysBadge d={days(o.halalExpiry)} /></td>
                         <td style={TD}><StatusPill status={o.status} /></td>
