@@ -40,7 +40,7 @@ const EMPTY = {
   serviceCharge: '', apFees: '',
   securityDeposit: '', utilitiesDeposit: '', mailboxDeposit: '',
   fitoutDeposit: '', restorationDeposit: '', otherDeposit: '', otherDepositRemark: '',
-  leaseExpiry: '', storageLeaseExpiry: '', halalExpiry: '', lad: '', ladRemarks: '',
+  leaseExpiry: '', storageLeaseExpiry: '', lad: '', ladRemarks: '',
   landlordName: '', tenantName: '', franchisee: '', contact: '', notes: '',
 }
 
@@ -99,7 +99,6 @@ const FORM_SECTIONS = [
     title: 'Lease & Legal', cols: 2, fields: [
       { k: 'leaseExpiry', l: 'Outlet Lease Expiry', type: 'date' },
       { k: 'storageLeaseExpiry', l: 'Storage Lease Expiry', type: 'date' },
-      { k: 'halalExpiry', l: 'Halal Cert Expiry', type: 'date' },
       { k: 'landlordName', l: 'Landlord Name' },
       { k: 'tenantName', l: 'Tenant Name' },
       { k: 'lad', l: 'LAD Rate' },
@@ -131,18 +130,18 @@ const DB_FIELDS = [
   { key: 'mailboxDeposit', label: 'Mailbox Deposit' }, { key: 'fitoutDeposit', label: 'Fitout Deposit' },
   { key: 'restorationDeposit', label: 'Restoration Deposit' }, { key: 'otherDeposit', label: 'Other Deposit' },
   { key: 'otherDepositRemark', label: 'Other Deposit Remark' },
-  { key: 'leaseExpiry', label: 'Outlet Lease Expiry' }, { key: 'storageLeaseExpiry', label: 'Storage Lease Expiry' }, { key: 'halalExpiry', label: 'Halal Expiry' },
+  { key: 'leaseExpiry', label: 'Outlet Lease Expiry' }, { key: 'storageLeaseExpiry', label: 'Storage Lease Expiry' },
   { key: 'lad', label: 'LAD Rate' }, { key: 'ladRemarks', label: 'LAD Remarks' },
   { key: 'landlordName', label: 'Landlord Name' }, { key: 'tenantName', label: 'Tenant Name' },
   { key: 'franchisee', label: 'Franchisee / PIC' }, { key: 'contact', label: 'Contact' }, { key: 'notes', label: 'Notes' },
 ]
 
 const MOCK = [
-  { id: 1, outletCode: 'TL-001', outletFormat: 'Inline', brand: 'Tealive', outletName: 'Mid Valley Megamall', state: 'Kuala Lumpur', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2019-03-15', closureDate: '', sqft: 350, storageSizeSqft: 40, lat: '3.1175', lng: '101.6765', outletAddress: 'Lot G-023, Mid Valley Megamall, 59200 KL', storageAddress: 'Store Room B2-12', monthlyRental: 22000, monthlyGrossRent: 25000, monthlySales: 185000, atv: 14.5, gto: 5, serviceCharge: 1800, apFees: 500, securityDeposit: 66000, utilitiesDeposit: 5000, mailboxDeposit: 0, fitoutDeposit: 10000, restorationDeposit: 15000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2026-03-31', halalExpiry: '2025-12-31', lad: 'RM500/day', ladRemarks: 'Triggered if fitout exceeds handover date', landlordName: 'IGB Berhad', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Tan Wei Liang', contact: '011-2345678', notes: 'High performer' },
-  { id: 2, outletCode: 'TL-002', outletFormat: 'Inline', brand: 'Tealive', outletName: 'Sunway Pyramid', state: 'Selangor', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2020-07-01', closureDate: '', sqft: 420, storageSizeSqft: 55, lat: '3.0731', lng: '101.6066', outletAddress: 'Lot LG1-88, Sunway Pyramid, Subang Jaya', storageAddress: 'Store LG1-S3', monthlyRental: 28000, monthlyGrossRent: 32000, monthlySales: 210000, atv: 15.2, gto: 6, serviceCharge: 2200, apFees: 600, securityDeposit: 84000, utilitiesDeposit: 6000, mailboxDeposit: 200, fitoutDeposit: 12000, restorationDeposit: 18000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2025-09-30', halalExpiry: '2025-06-30', lad: 'RM800/day', ladRemarks: 'After 14-day grace period', landlordName: 'Sunway Malls', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Lim Soo Fen', contact: '012-9876543', notes: 'Lease renewal urgent' },
-  { id: 3, outletCode: 'BB-001', outletFormat: 'Cafe', brand: 'Bask Bear Coffee', outletName: 'IOI City Mall', state: 'Selangor', type: 'Mall', model: 'Company-Owned', status: 'Active', openingDate: '2021-11-20', closureDate: '', sqft: 600, storageSizeSqft: 80, lat: '2.9726', lng: '101.7221', outletAddress: 'Lot 2F-34, IOI City Mall, Putrajaya', storageAddress: 'Back-of-house', monthlyRental: 35000, monthlyGrossRent: 40000, monthlySales: 155000, atv: 18.0, gto: 7, serviceCharge: 3000, apFees: 800, securityDeposit: 105000, utilitiesDeposit: 8000, mailboxDeposit: 300, fitoutDeposit: 20000, restorationDeposit: 25000, otherDeposit: 5000, otherDepositRemark: 'Signage deposit', leaseExpiry: '2027-06-30', halalExpiry: '2026-03-31', lad: 'RM1000/day', ladRemarks: 'Cap at 5%', landlordName: 'IOI Properties', tenantName: 'Loob Holding Sdn Bhd', franchisee: '', contact: '', notes: 'Flagship store' },
-  { id: 4, outletCode: 'AY-001', outletFormat: 'Restaurant', brand: 'Ayee Southern Thai', outletName: 'Pavilion Bukit Jalil', state: 'Kuala Lumpur', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2023-01-10', closureDate: '', sqft: 800, storageSizeSqft: 120, lat: '3.0584', lng: '101.6901', outletAddress: 'Lot 3F-11, Pavilion Bukit Jalil', storageAddress: 'Store 3F-S5', monthlyRental: 32000, monthlyGrossRent: 38000, monthlySales: 98000, atv: 22.5, gto: 8, serviceCharge: 4000, apFees: 1000, securityDeposit: 96000, utilitiesDeposit: 10000, mailboxDeposit: 300, fitoutDeposit: 25000, restorationDeposit: 30000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2027-03-31', halalExpiry: '2026-06-30', lad: 'RM1200/day', ladRemarks: 'Under review', landlordName: 'Pavilion Group', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Mohd Razif', contact: '019-8877665', notes: 'Below target' },
-  { id: 5, outletCode: 'GD-001', outletFormat: 'Kiosk', brand: 'Gindaco', outletName: 'Pavilion KL', state: 'Kuala Lumpur', type: 'Mall', model: 'JV', status: 'Active', openingDate: '2022-09-05', closureDate: '', sqft: 200, storageSizeSqft: 20, lat: '3.1488', lng: '101.7131', outletAddress: 'Lot G-118, Pavilion KL', storageAddress: 'N/A', monthlyRental: 25000, monthlyGrossRent: 28000, monthlySales: 88000, atv: 19.0, gto: 6, serviceCharge: 1200, apFees: 400, securityDeposit: 75000, utilitiesDeposit: 5000, mailboxDeposit: 200, fitoutDeposit: 8000, restorationDeposit: 12000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2026-06-30', halalExpiry: '2025-09-30', lad: 'RM700/day', ladRemarks: 'JV co-liable', landlordName: 'Pavilion Group', tenantName: 'Gindaco Malaysia JV', franchisee: 'JV Partner', contact: '', notes: 'Monitor closely' },
+  { id: 1, outletCode: 'TL-001', outletFormat: 'Inline', brand: 'Tealive', outletName: 'Mid Valley Megamall', state: 'Kuala Lumpur', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2019-03-15', closureDate: '', sqft: 350, storageSizeSqft: 40, lat: '3.1175', lng: '101.6765', outletAddress: 'Lot G-023, Mid Valley Megamall, 59200 KL', storageAddress: 'Store Room B2-12', monthlyRental: 22000, monthlyGrossRent: 25000, monthlySales: 185000, atv: 14.5, gto: 5, serviceCharge: 1800, apFees: 500, securityDeposit: 66000, utilitiesDeposit: 5000, mailboxDeposit: 0, fitoutDeposit: 10000, restorationDeposit: 15000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2026-03-31', lad: 'RM500/day', ladRemarks: 'Triggered if fitout exceeds handover date', landlordName: 'IGB Berhad', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Tan Wei Liang', contact: '011-2345678', notes: 'High performer' },
+  { id: 2, outletCode: 'TL-002', outletFormat: 'Inline', brand: 'Tealive', outletName: 'Sunway Pyramid', state: 'Selangor', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2020-07-01', closureDate: '', sqft: 420, storageSizeSqft: 55, lat: '3.0731', lng: '101.6066', outletAddress: 'Lot LG1-88, Sunway Pyramid, Subang Jaya', storageAddress: 'Store LG1-S3', monthlyRental: 28000, monthlyGrossRent: 32000, monthlySales: 210000, atv: 15.2, gto: 6, serviceCharge: 2200, apFees: 600, securityDeposit: 84000, utilitiesDeposit: 6000, mailboxDeposit: 200, fitoutDeposit: 12000, restorationDeposit: 18000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2025-09-30', lad: 'RM800/day', ladRemarks: 'After 14-day grace period', landlordName: 'Sunway Malls', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Lim Soo Fen', contact: '012-9876543', notes: 'Lease renewal urgent' },
+  { id: 3, outletCode: 'BB-001', outletFormat: 'Cafe', brand: 'Bask Bear Coffee', outletName: 'IOI City Mall', state: 'Selangor', type: 'Mall', model: 'Company-Owned', status: 'Active', openingDate: '2021-11-20', closureDate: '', sqft: 600, storageSizeSqft: 80, lat: '2.9726', lng: '101.7221', outletAddress: 'Lot 2F-34, IOI City Mall, Putrajaya', storageAddress: 'Back-of-house', monthlyRental: 35000, monthlyGrossRent: 40000, monthlySales: 155000, atv: 18.0, gto: 7, serviceCharge: 3000, apFees: 800, securityDeposit: 105000, utilitiesDeposit: 8000, mailboxDeposit: 300, fitoutDeposit: 20000, restorationDeposit: 25000, otherDeposit: 5000, otherDepositRemark: 'Signage deposit', leaseExpiry: '2027-06-30', lad: 'RM1000/day', ladRemarks: 'Cap at 5%', landlordName: 'IOI Properties', tenantName: 'Loob Holding Sdn Bhd', franchisee: '', contact: '', notes: 'Flagship store' },
+  { id: 4, outletCode: 'AY-001', outletFormat: 'Restaurant', brand: 'Ayee Southern Thai', outletName: 'Pavilion Bukit Jalil', state: 'Kuala Lumpur', type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '2023-01-10', closureDate: '', sqft: 800, storageSizeSqft: 120, lat: '3.0584', lng: '101.6901', outletAddress: 'Lot 3F-11, Pavilion Bukit Jalil', storageAddress: 'Store 3F-S5', monthlyRental: 32000, monthlyGrossRent: 38000, monthlySales: 98000, atv: 22.5, gto: 8, serviceCharge: 4000, apFees: 1000, securityDeposit: 96000, utilitiesDeposit: 10000, mailboxDeposit: 300, fitoutDeposit: 25000, restorationDeposit: 30000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2027-03-31', lad: 'RM1200/day', ladRemarks: 'Under review', landlordName: 'Pavilion Group', tenantName: 'Loob Holding Sdn Bhd', franchisee: 'Mohd Razif', contact: '019-8877665', notes: 'Below target' },
+  { id: 5, outletCode: 'GD-001', outletFormat: 'Kiosk', brand: 'Gindaco', outletName: 'Pavilion KL', state: 'Kuala Lumpur', type: 'Mall', model: 'JV', status: 'Active', openingDate: '2022-09-05', closureDate: '', sqft: 200, storageSizeSqft: 20, lat: '3.1488', lng: '101.7131', outletAddress: 'Lot G-118, Pavilion KL', storageAddress: 'N/A', monthlyRental: 25000, monthlyGrossRent: 28000, monthlySales: 88000, atv: 19.0, gto: 6, serviceCharge: 1200, apFees: 400, securityDeposit: 75000, utilitiesDeposit: 5000, mailboxDeposit: 200, fitoutDeposit: 8000, restorationDeposit: 12000, otherDeposit: 0, otherDepositRemark: '', leaseExpiry: '2026-06-30', lad: 'RM700/day', ladRemarks: 'JV co-liable', landlordName: 'Pavilion Group', tenantName: 'Gindaco Malaysia JV', franchisee: 'JV Partner', contact: '', notes: 'Monitor closely' },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -168,7 +167,7 @@ function toDB(o) {
     mailbox_deposit: o.mailboxDeposit || null, fitout_deposit: o.fitoutDeposit || null,
     restoration_deposit: o.restorationDeposit || null,
     other_deposit: o.otherDeposit || null, other_deposit_remark: o.otherDepositRemark || null,
-    lease_expiry: o.leaseExpiry || null, storage_lease_expiry: o.storageLeaseExpiry || null, halal_expiry: o.halalExpiry || null,
+    lease_expiry: o.leaseExpiry || null, storage_lease_expiry: o.storageLeaseExpiry || null,
     lad: o.lad, lad_remarks: o.ladRemarks, landlord_name: o.landlordName, tenant_name: o.tenantName,
     franchisee: o.franchisee, contact: o.contact, notes: o.notes,
   }
@@ -189,7 +188,7 @@ function fromDB(r) {
     mailboxDeposit: r.mailbox_deposit || '', fitoutDeposit: r.fitout_deposit || '',
     restorationDeposit: r.restoration_deposit || '',
     otherDeposit: r.other_deposit || '', otherDepositRemark: r.other_deposit_remark || '',
-    leaseExpiry: r.lease_expiry || '', storageLeaseExpiry: r.storage_lease_expiry || '', halalExpiry: r.halal_expiry || '',
+    leaseExpiry: r.lease_expiry || '', storageLeaseExpiry: r.storage_lease_expiry || '',
     lad: r.lad || '', ladRemarks: r.lad_remarks || '',
     landlordName: r.landlord_name || '', tenantName: r.tenant_name || '',
     franchisee: r.franchisee || '', contact: r.contact || '', notes: r.notes || '',
@@ -372,7 +371,7 @@ function ImportView({ onImported, showToast, isLive }) {
         mailbox_deposit: toNum(o.mailboxDeposit), fitout_deposit: toNum(o.fitoutDeposit),
         restoration_deposit: toNum(o.restorationDeposit), other_deposit: toNum(o.otherDeposit),
         other_deposit_remark: o.otherDepositRemark,
-        lease_expiry: o.leaseExpiry || null, halal_expiry: o.halalExpiry || null,
+        lease_expiry: o.leaseExpiry || null,
         lad: o.lad, lad_remarks: o.ladRemarks, landlord_name: o.landlordName, tenant_name: o.tenantName,
         franchisee: o.franchisee, contact: o.contact, notes: o.notes,
       }))
@@ -596,7 +595,7 @@ function AppContent({ role, onLogout }) {
     if (filterBrand !== 'All Brands') d = d.filter(o => o.brand === filterBrand)
     if (filterStatus !== 'All') d = d.filter(o => o.status === filterStatus)
     if (search) d = d.filter(o => [o.outletCode, o.outletName, o.state, o.franchisee, o.outletAddress, o.landlordName, o.notes].join(' ').toLowerCase().includes(search.toLowerCase()))
-    if (alertsOnly) d = d.filter(o => { const ld = days(o.leaseExpiry), sd = days(o.storageLeaseExpiry), hd = days(o.halalExpiry); return (ld !== null && ld < 120) || (sd !== null && sd < 120) || (hd !== null && hd < 120) })
+    if (alertsOnly) d = d.filter(o => { const ld = days(o.leaseExpiry), sd = days(o.storageLeaseExpiry); return (ld !== null && ld < 120) || (sd !== null && sd < 120) })
     d.sort((a, b) => { let av = a[sortK] ?? '', bv = b[sortK] ?? ''; if (typeof av === 'string') av = av.toLowerCase(); if (typeof bv === 'string') bv = bv.toLowerCase(); return sortAsc ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1) })
     return d
   }, [outlets, filterBrand, filterStatus, search, sortK, sortAsc, alertsOnly])
@@ -607,7 +606,7 @@ function AppContent({ role, onLogout }) {
     const rental = ac.reduce((s, o) => s + (Number(o.monthlyGrossRent) || Number(o.monthlyRental) || 0), 0)
     const deps = outlets.reduce((s, o) => s + dep(o), 0)
     const avgRS = sales ? ((rental / sales) * 100).toFixed(1) : 0
-    const alerts = outlets.filter(o => { const ld = days(o.leaseExpiry), hd = days(o.halalExpiry); return (ld !== null && ld < 120) || (hd !== null && hd < 120) }).length
+    const alerts = outlets.filter(o => { const ld = days(o.leaseExpiry); return (ld !== null && ld < 120) || (hd !== null && hd < 120) }).length
     return { total: outlets.length, active: ac.length, sales, rental, deps, avgRS, alerts }
   }, [outlets])
 
@@ -647,8 +646,8 @@ function AppContent({ role, onLogout }) {
   }
 
   function exportCSV() {
-    const keys = ['outletCode', 'outletFormat', 'brand', 'outletName', 'state', 'type', 'model', 'status', 'openingDate', 'closureDate', 'sqft', 'storageSizeSqft', 'lat', 'lng', 'outletAddress', 'storageAddress', 'monthlyRental', 'monthlyGrossRent', 'monthlySales', 'atv', 'gto', 'serviceCharge', 'apFees', 'securityDeposit', 'utilitiesDeposit', 'mailboxDeposit', 'fitoutDeposit', 'restorationDeposit', 'otherDeposit', 'otherDepositRemark', 'leaseExpiry', 'halalExpiry', 'lad', 'ladRemarks', 'landlordName', 'tenantName', 'franchisee', 'contact', 'notes']
-    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Sqft', 'Storage Sqft', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'Halal Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
+    const keys = ['outletCode', 'outletFormat', 'brand', 'outletName', 'state', 'type', 'model', 'status', 'openingDate', 'closureDate', 'sqft', 'storageSizeSqft', 'lat', 'lng', 'outletAddress', 'storageAddress', 'monthlyRental', 'monthlyGrossRent', 'monthlySales', 'atv', 'gto', 'serviceCharge', 'apFees', 'securityDeposit', 'utilitiesDeposit', 'mailboxDeposit', 'fitoutDeposit', 'restorationDeposit', 'otherDeposit', 'otherDepositRemark', 'leaseExpiry', 'lad', 'ladRemarks', 'landlordName', 'tenantName', 'franchisee', 'contact', 'notes']
+    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Sqft', 'Storage Sqft', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
     const rows = filtered.map(o => [...keys.map(k => o[k] ?? ''), rsr(o.monthlyGrossRent || o.monthlyRental, o.monthlySales) ?? ''])
     const csv = [[...hdrs, 'R/S Ratio (%)'], ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
     const a = document.createElement('a')
@@ -690,7 +689,7 @@ function AppContent({ role, onLogout }) {
 
         <div style={{ marginTop: 'auto', padding: '0 16px' }}>
           <button onClick={load} style={{ width: '100%', background: '#fff', border: `1px solid ${C.border}`, color: C.sub, padding: '9px', borderRadius: 9, cursor: 'pointer', fontSize: 13, marginBottom: 10 }}>↺ Refresh</button>
-          {stats.alerts > 0 && <div style={{ background: C.redBg, border: `1px solid #FCA5A5`, borderRadius: 10, padding: '11px 14px', fontSize: 14, marginBottom: 10 }}><div style={{ color: C.red, fontWeight: 700 }}>⚠ {stats.alerts} Alerts</div><div style={{ color: C.red, opacity: 0.7, fontSize: 13, marginTop: 2 }}>Lease / Halal expiring</div></div>}
+          {stats.alerts > 0 && <div style={{ background: C.redBg, border: `1px solid #FCA5A5`, borderRadius: 10, padding: '11px 14px', fontSize: 14, marginBottom: 10 }}><div style={{ color: C.red, fontWeight: 700 }}>⚠ {stats.alerts} Alerts</div><div style={{ color: C.red, opacity: 0.7, fontSize: 13, marginTop: 2 }}>Lease expiring soon</div></div>}
           {(() => {
             const expiring30 = outlets.filter(o => { const d = days(o.leaseExpiry); return d !== null && d >= 0 && d <= 30 }).length
             const expiring90 = outlets.filter(o => { const d = days(o.leaseExpiry); return d !== null && d > 30 && d <= 90 }).length
@@ -777,9 +776,9 @@ function AppContent({ role, onLogout }) {
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.sub, marginBottom: 16, letterSpacing: 1 }}>UPCOMING ALERTS</div>
                   {outlets.flatMap(o => {
                     const items = []
-                    const ld = days(o.leaseExpiry), hd = days(o.halalExpiry)
+                    const ld = days(o.leaseExpiry)
                     if (ld !== null && ld < 120) items.push({ name: o.outletName, code: o.outletCode, brand: o.brand, type: 'Lease', d: ld })
-                    if (hd !== null && hd < 120) items.push({ name: o.outletName, code: o.outletCode, brand: o.brand, type: 'Halal', d: hd })
+                    
                     return items
                   }).sort((a, b) => a.d - b.d).slice(0, 6).map((a, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: `1px solid ${C.border}` }}>
@@ -811,7 +810,7 @@ function AppContent({ role, onLogout }) {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        {[['outletCode', 'Code'], ['outletFormat', 'Format'], ['brand', 'Brand'], ['outletName', 'Outlet Name'], ['state', 'State'], ['type', 'Type'], ['model', 'Model'], ['status', 'Status'], ['sqft', 'Sqft'], ['monthlyRental', 'Base Rent'], ['monthlyGrossRent', 'Gross Rent'], ['monthlySales', 'Avg Sales'], ['_rs', 'R/S'], ['leaseExpiry', 'Lease'], ['halalExpiry', 'Halal'], ['franchisee', 'PIC']].map(([k, l]) => (
+                        {[['outletCode', 'Code'], ['outletFormat', 'Format'], ['brand', 'Brand'], ['outletName', 'Outlet Name'], ['state', 'State'], ['type', 'Type'], ['model', 'Model'], ['status', 'Status'], ['sqft', 'Sqft'], ['monthlyRental', 'Base Rent'], ['monthlyGrossRent', 'Gross Rent'], ['monthlySales', 'Avg Sales'], ['_rs', 'R/S'], ['leaseExpiry', 'Lease'], ['franchisee', 'PIC']].map(([k, l]) => (
                           <th key={k} onClick={() => !k.startsWith('_') && sortBy(k)} style={{ ...TH, cursor: 'pointer', color: sortK === k ? C.accent : C.sub }}>{l}{sortK === k ? (sortAsc ? ' ↑' : ' ↓') : ''}</th>
                         ))}
                         {isAdmin && <th style={TH}>ACTIONS</th>}
@@ -820,7 +819,7 @@ function AppContent({ role, onLogout }) {
                     <tbody>
                       {filtered.map((o, i) => {
                         const rs = rsr(o.monthlyGrossRent || o.monthlyRental, o.monthlySales)
-                        const ld = days(o.leaseExpiry), hd = days(o.halalExpiry)
+                        const ld = days(o.leaseExpiry)
                         const isExp = expanded === o.id
                         return [
                           <tr key={o.id} onClick={() => setExpanded(isExp ? null : o.id)} style={{ background: isExp ? C.accentBg : i % 2 === 0 ? '#fff' : '#FAFBFD', cursor: 'pointer' }}>
@@ -838,7 +837,6 @@ function AppContent({ role, onLogout }) {
                             <td style={{ ...TD, fontWeight: 600 }}>{o.monthlySales ? 'RM ' + Number(o.monthlySales).toLocaleString() : '—'}</td>
                             <td style={TD}><RSB ratio={rs} /></td>
                             <td style={TD}><DaysBadge d={ld} /></td>
-                            <td style={TD}><DaysBadge d={hd} /></td>
                             <td style={{ ...TD, color: C.sub }}>{o.franchisee || '—'}</td>
                             {isAdmin && (
                               <td style={TD} onClick={e => e.stopPropagation()}>
@@ -952,15 +950,15 @@ function AppContent({ role, onLogout }) {
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 20 }}>
                 {[[C.red, C.redBg, 'Critical (<60 days)'], [C.amber, C.amberBg, 'Warning (60–120 days)'], [C.green, C.greenBg, 'On Track (>120 days)']].map(([c, bg, l], i) => {
-                  const cnt = outlets.filter(o => { const mn = Math.min(days(o.leaseExpiry) ?? 9999, days(o.halalExpiry) ?? 9999); return i === 0 ? mn < 60 : i === 1 ? mn >= 60 && mn < 120 : mn >= 120 }).length
+                  const cnt = outlets.filter(o => { const mn = Math.min(days(o.leaseExpiry) ?? 9999, days(o.storageLeaseExpiry) ?? 9999); return i === 0 ? mn < 60 : i === 1 ? mn >= 60 && mn < 120 : mn >= 120 }).length
                   return <div key={l} style={{ background: bg, border: `1px solid ${c}44`, borderRadius: 14, padding: '20px 22px' }}><div style={{ fontSize: 13, color: c, letterSpacing: 1, fontWeight: 700 }}>{l.toUpperCase()}</div><div style={{ fontSize: 36, fontWeight: 800, color: c, marginTop: 8 }}>{cnt}</div></div>
                 })}
               </div>
               <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead><tr>{['Code', 'Brand', 'Outlet', 'State', 'Outlet Lease', 'Outlet Lease', 'Storage Lease', 'Storage Lease', 'Halal Expiry', 'Halal', 'Status'].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                  <thead><tr>{['Code', 'Brand', 'Outlet', 'State', 'Outlet Lease Expiry', 'Outlet Lease', 'Storage Lease Expiry', 'Storage Lease', 'Status'].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
                   <tbody>
-                    {[...outlets].sort((a, b) => Math.min(days(a.leaseExpiry) ?? 9999, days(a.storageLeaseExpiry) ?? 9999, days(a.halalExpiry) ?? 9999) - Math.min(days(b.leaseExpiry) ?? 9999, days(b.storageLeaseExpiry) ?? 9999, days(b.halalExpiry) ?? 9999)).map((o, i) => (
+                    {[...outlets].sort((a, b) => Math.min(days(a.leaseExpiry) ?? 9999, days(a.storageLeaseExpiry) ?? 9999) - Math.min(days(b.leaseExpiry) ?? 9999, days(b.storageLeaseExpiry) ?? 9999)).map((o, i) => (
                       <tr key={o.id} style={{ background: i % 2 === 0 ? '#fff' : '#FAFBFD' }}>
                         <td style={{ ...TD, fontFamily: 'monospace', color: C.accent, fontWeight: 700 }}>{o.outletCode}</td>
                         <td style={TD}><span style={{ color: BRAND_COLOR[o.brand] || C.text, fontWeight: 700, fontSize: 13 }}>{o.brand}</span></td>
@@ -970,8 +968,6 @@ function AppContent({ role, onLogout }) {
                         <td style={TD}><DaysBadge d={days(o.leaseExpiry)} /></td>
                         <td style={{ ...TD, color: C.sub }}>{o.storageLeaseExpiry || '—'}</td>
                         <td style={TD}><DaysBadge d={days(o.storageLeaseExpiry)} /></td>
-                        <td style={{ ...TD, color: C.sub }}>{o.halalExpiry || '—'}</td>
-                        <td style={TD}><DaysBadge d={days(o.halalExpiry)} /></td>
                         <td style={TD}><StatusPill status={o.status} /></td>
                       </tr>
                     ))}
