@@ -35,7 +35,7 @@ const NAV = [
 const EMPTY = {
   id: null, outletCode: '', outletFormat: '', brand: 'Tealive', outletName: '', state: '',
   type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '', closureDate: '',
-  sqft: '', storageSizeSqft: '', lat: '', lng: '', outletAddress: '', storageAddress: '',
+  sqft: '', storageSizeSqft: '', storageRental: '', storageSecurityDeposit: '', storageUtilitiesDeposit: '', storageFitoutDeposit: '', lat: '', lng: '', outletAddress: '', storageAddress: '',
   monthlyRental: '', monthlyGrossRent: '', monthlySales: '', atv: '', gto: '',
   serviceCharge: '', apFees: '',
   securityDeposit: '', utilitiesDeposit: '', mailboxDeposit: '',
@@ -67,6 +67,10 @@ const FORM_SECTIONS = [
     title: 'Site Details', cols: 3, fields: [
       { k: 'sqft', l: 'Store Sqft', type: 'number' },
       { k: 'storageSizeSqft', l: 'Storage Sqft', type: 'number' },
+      { k: 'storageRental', l: 'Storage Rental/mo (RM)', type: 'number' },
+      { k: 'storageSecurityDeposit', l: 'Storage Security Deposit (RM)', type: 'number' },
+      { k: 'storageUtilitiesDeposit', l: 'Storage Utilities Deposit (RM)', type: 'number' },
+      { k: 'storageFitoutDeposit', l: 'Storage Fitout Deposit (RM)', type: 'number' },
       { k: 'lat', l: 'Latitude' },
       { k: 'lng', l: 'Longitude' },
       { k: 'outletAddress', l: 'Outlet Address', full: true },
@@ -120,7 +124,7 @@ const DB_FIELDS = [
   { key: 'state', label: 'State' }, { key: 'type', label: 'Location Type' },
   { key: 'model', label: 'Business Model' }, { key: 'status', label: 'Status' },
   { key: 'openingDate', label: 'Opening Date' }, { key: 'closureDate', label: 'Closure Date' },
-  { key: 'sqft', label: 'Store Sqft' }, { key: 'storageSizeSqft', label: 'Storage Sqft' },
+  { key: 'sqft', label: 'Store Sqft' }, { key: 'storageSizeSqft', label: 'Storage Sqft' }, { key: 'storageRental', label: 'Storage Rental' }, { key: 'storageSecurityDeposit', label: 'Storage Security Deposit' }, { key: 'storageUtilitiesDeposit', label: 'Storage Utilities Deposit' }, { key: 'storageFitoutDeposit', label: 'Storage Fitout Deposit' },
   { key: 'lat', label: 'Latitude' }, { key: 'lng', label: 'Longitude' },
   { key: 'outletAddress', label: 'Outlet Address' }, { key: 'storageAddress', label: 'Storage Address' },
   { key: 'monthlyRental', label: 'Monthly Base Rent' }, { key: 'monthlyGrossRent', label: 'Monthly Gross Rent' },
@@ -148,7 +152,7 @@ const MOCK = [
 const rsr = (r, s) => (!s || s == 0) ? null : ((r / s) * 100).toFixed(1)
 const days = d => !d ? null : Math.ceil((new Date(d) - new Date()) / 86400000)
 const fRM = v => (v === '' || v === null || v === undefined) ? '—' : 'RM ' + Number(v).toLocaleString()
-const dep = o => [o.securityDeposit, o.utilitiesDeposit, o.mailboxDeposit, o.fitoutDeposit, o.restorationDeposit, o.otherDeposit].reduce((s, v) => s + (Number(v) || 0), 0)
+const dep = o => [o.securityDeposit, o.utilitiesDeposit, o.mailboxDeposit, o.fitoutDeposit, o.restorationDeposit, o.otherDeposit, o.storageSecurityDeposit, o.storageUtilitiesDeposit, o.storageFitoutDeposit].reduce((s, v) => s + (Number(v) || 0), 0)
 const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '')
 const stopKey = e => e.stopPropagation()
 
@@ -158,7 +162,7 @@ function toDB(o) {
     outlet_code: o.outletCode, outlet_format: o.outletFormat, brand: o.brand,
     outlet_name: o.outletName, state: o.state, type: o.type, model: o.model, status: o.status,
     opening_date: o.openingDate || null, closure_date: o.closureDate || null,
-    sqft: o.sqft || null, storage_size_sqft: o.storageSizeSqft || null,
+    sqft: o.sqft || null, storage_size_sqft: o.storageSizeSqft || null, storage_rental: o.storageRental || null, storage_security_deposit: o.storageSecurityDeposit || null, storage_utilities_deposit: o.storageUtilitiesDeposit || null, storage_fitout_deposit: o.storageFitoutDeposit || null,
     lat: o.lat, lng: o.lng, outlet_address: o.outletAddress, storage_address: o.storageAddress,
     monthly_rental: o.monthlyRental || null, monthly_gross_rent: o.monthlyGrossRent || null,
     monthly_sales: o.monthlySales || null, atv: o.atv || null, gto: o.gto || null,
@@ -179,7 +183,7 @@ function fromDB(r) {
     brand: r.brand || '', outletName: r.outlet_name || '', state: r.state || '',
     type: r.type || '', model: r.model || '', status: r.status || 'Active',
     openingDate: r.opening_date || '', closureDate: r.closure_date || '',
-    sqft: r.sqft || '', storageSizeSqft: r.storage_size_sqft || '',
+    sqft: r.sqft || '', storageSizeSqft: r.storage_size_sqft || '', storageRental: r.storage_rental || '', storageSecurityDeposit: r.storage_security_deposit || '', storageUtilitiesDeposit: r.storage_utilities_deposit || '', storageFitoutDeposit: r.storage_fitout_deposit || '',
     lat: r.lat || '', lng: r.lng || '', outletAddress: r.outlet_address || '', storageAddress: r.storage_address || '',
     monthlyRental: r.monthly_rental || '', monthlyGrossRent: r.monthly_gross_rent || '',
     monthlySales: r.monthly_sales || '', atv: r.atv || '', gto: r.gto || '',
@@ -646,8 +650,8 @@ function AppContent({ role, onLogout }) {
   }
 
   function exportCSV() {
-    const keys = ['outletCode', 'outletFormat', 'brand', 'outletName', 'state', 'type', 'model', 'status', 'openingDate', 'closureDate', 'sqft', 'storageSizeSqft', 'lat', 'lng', 'outletAddress', 'storageAddress', 'monthlyRental', 'monthlyGrossRent', 'monthlySales', 'atv', 'gto', 'serviceCharge', 'apFees', 'securityDeposit', 'utilitiesDeposit', 'mailboxDeposit', 'fitoutDeposit', 'restorationDeposit', 'otherDeposit', 'otherDepositRemark', 'leaseExpiry', 'lad', 'ladRemarks', 'landlordName', 'tenantName', 'franchisee', 'contact', 'notes']
-    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Sqft', 'Storage Sqft', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
+    const keys = ['outletCode', 'outletFormat', 'brand', 'outletName', 'state', 'type', 'model', 'status', 'openingDate', 'closureDate', 'sqft', 'storageSizeSqft', 'storageRental', 'storageSecurityDeposit', 'storageUtilitiesDeposit', 'storageFitoutDeposit', 'lat', 'lng', 'outletAddress', 'storageAddress', 'monthlyRental', 'monthlyGrossRent', 'monthlySales', 'atv', 'gto', 'serviceCharge', 'apFees', 'securityDeposit', 'utilitiesDeposit', 'mailboxDeposit', 'fitoutDeposit', 'restorationDeposit', 'otherDeposit', 'otherDepositRemark', 'leaseExpiry', 'lad', 'ladRemarks', 'landlordName', 'tenantName', 'franchisee', 'contact', 'notes']
+    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Sqft', 'Storage Sqft', 'Storage Rental', 'Storage Sec Deposit', 'Storage Util Deposit', 'Storage Fitout Deposit', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
     const rows = filtered.map(o => [...keys.map(k => o[k] ?? ''), rsr(o.monthlyGrossRent || o.monthlyRental, o.monthlySales) ?? ''])
     const csv = [[...hdrs, 'R/S Ratio (%)'], ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
     const a = document.createElement('a')
@@ -854,7 +858,7 @@ function AppContent({ role, onLogout }) {
                                   {[
                                     ['Opening Date', o.openingDate || '—'],
                                     ['Storage Lease Expiry', o.storageLeaseExpiry || '—'],
-                                    ['Storage Sqft', o.storageSizeSqft ? o.storageSizeSqft + ' sqft' : '—'],
+                                    ['Storage Sqft', o.storageSizeSqft ? o.storageSizeSqft + ' sqft' : '—'], ['Storage Rental/mo', fRM(o.storageRental)], ['Storage Sec Dep', fRM(o.storageSecurityDeposit)], ['Storage Util Dep', fRM(o.storageUtilitiesDeposit)], ['Storage Fitout Dep', fRM(o.storageFitoutDeposit)],
                                     ['Coordinates', (o.lat && o.lng) ? `${o.lat}, ${o.lng}` : '—'],
                                     ['GTO %', o.gto ? o.gto + '%' : '—'],
                                     ['GTO Amt/mo', o.gto && o.monthlySales ? fRM(Math.round(Number(o.monthlySales) * Number(o.gto) / 100)) : '—'],
