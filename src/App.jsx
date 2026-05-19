@@ -35,12 +35,12 @@ const NAV = [
 const EMPTY = {
   id: null, outletCode: '', outletFormat: '', brand: 'Tealive', outletName: '', state: '',
   type: 'Mall', model: 'Franchise', status: 'Active', openingDate: '', closureDate: '',
-  sqft: '', storageSizeSqft: '', storageRental: '', storageSecurityDeposit: '', storageUtilitiesDeposit: '', storageFitoutDeposit: '', lat: '', lng: '', outletAddress: '', storageAddress: '',
+  sqft: '', storageSizeSqft: '', storageRental: '', miscRental: '', storageSecurityDeposit: '', storageUtilitiesDeposit: '', storageMailboxDeposit: '', storageFitoutDeposit: '', storageRestorationDeposit: '', storageOtherDeposit: '', lat: '', lng: '', outletAddress: '', storageAddress: '',
   monthlyRental: '', monthlyGrossRent: '', monthlySales: '', atv: '', gto: '',
   serviceCharge: '', apFees: '',
   securityDeposit: '', utilitiesDeposit: '', mailboxDeposit: '',
   fitoutDeposit: '', restorationDeposit: '', otherDeposit: '', otherDepositRemark: '',
-  leaseExpiry: '', storageLeaseExpiry: '', lad: '', ladRemarks: '',
+  leaseExpiry: '', leaseCommencement: '', renewalNotice: '', storageLeaseExpiry: '', storageLeaseCommencement: '', lad: '', ladRemarks: '',
   landlordName: '', tenantName: '', franchisee: '', contact: '', notes: '',
 }
 
@@ -64,21 +64,26 @@ const FORM_SECTIONS = [
     ]
   },
   {
-    title: 'Site Details', cols: 3, fields: [
-      { k: 'sqft', l: 'Store Sqft', type: 'number' },
-      { k: 'storageSizeSqft', l: 'Storage Sqft', type: 'number' },
-      { k: 'storageRental', l: 'Storage Rental/mo (RM)', type: 'number' },
-      { k: 'storageSecurityDeposit', l: 'Storage Security Deposit (RM)', type: 'number' },
-      { k: 'storageUtilitiesDeposit', l: 'Storage Utilities Deposit (RM)', type: 'number' },
-      { k: 'storageFitoutDeposit', l: 'Storage Fitout Deposit (RM)', type: 'number' },
+    title: 'Outlet — Site', cols: 3, fields: [
+      { k: 'sqft', l: 'Outlet Sqft', type: 'number' },
       { k: 'lat', l: 'Latitude' },
       { k: 'lng', l: 'Longitude' },
       { k: 'outletAddress', l: 'Outlet Address', full: true },
-      { k: 'storageAddress', l: 'Storage Address', full: true },
     ]
   },
   {
-    title: 'Commercial', cols: 3, fields: [
+    title: 'Outlet — Lease & Legal', cols: 2, fields: [
+      { k: 'leaseCommencement', l: 'Outlet Lease Commencement', type: 'date' },
+      { k: 'leaseExpiry', l: 'Outlet Lease Expiry', type: 'date' },
+      { k: 'renewalNotice', l: 'Renewal Notice (months)', type: 'number' },
+      { k: 'landlordName', l: 'Landlord Name' },
+      { k: 'tenantName', l: 'Tenant Name' },
+      { k: 'lad', l: 'LAD Rate' },
+      { k: 'ladRemarks', l: 'LAD Remarks', full: true },
+    ]
+  },
+  {
+    title: 'Outlet — Commercial', cols: 3, fields: [
       { k: 'monthlyRental', l: 'Monthly Base Rent (RM)', type: 'number' },
       { k: 'monthlyGrossRent', l: 'Monthly Gross Rent (RM)', type: 'number' },
       { k: 'monthlySales', l: 'Avg Monthly Sales (RM)', type: 'number' },
@@ -86,27 +91,45 @@ const FORM_SECTIONS = [
       { k: 'gto', l: 'GTO % (of Avg Monthly Sales)', type: 'number' },
       { k: 'serviceCharge', l: 'Service Charge/mo (RM)', type: 'number' },
       { k: 'apFees', l: 'A&P Fees/mo (RM)', type: 'number' },
+      { k: 'miscRental', l: 'Misc Rent/mo (RM)', type: 'number' },
     ]
   },
   {
-    title: 'Deposits', cols: 3, fields: [
-      { k: 'securityDeposit', l: 'Security Deposit (RM)', type: 'number' },
-      { k: 'utilitiesDeposit', l: 'Utilities Deposit (RM)', type: 'number' },
-      { k: 'mailboxDeposit', l: 'Mailbox Deposit (RM)', type: 'number' },
-      { k: 'fitoutDeposit', l: 'Fitout Deposit (RM)', type: 'number' },
-      { k: 'restorationDeposit', l: 'Restoration Deposit (RM)', type: 'number' },
-      { k: 'otherDeposit', l: 'Other Deposit (RM)', type: 'number' },
-      { k: 'otherDepositRemark', l: 'Other Deposit Remark', full: true },
+    title: 'Outlet — Deposits', cols: 3, fields: [
+      { k: 'securityDeposit', l: 'Outlet Security Deposit (RM)', type: 'number' },
+      { k: 'utilitiesDeposit', l: 'Outlet Utilities Deposit (RM)', type: 'number' },
+      { k: 'mailboxDeposit', l: 'Outlet Mailbox Deposit (RM)', type: 'number' },
+      { k: 'fitoutDeposit', l: 'Outlet Fitout Deposit (RM)', type: 'number' },
+      { k: 'restorationDeposit', l: 'Outlet Restoration Deposit (RM)', type: 'number' },
+      { k: 'otherDeposit', l: 'Outlet Other Deposit (RM)', type: 'number' },
+      { k: 'otherDepositRemark', l: 'Outlet Other Deposit Remark', full: true },
     ]
   },
   {
-    title: 'Lease & Legal', cols: 2, fields: [
-      { k: 'leaseExpiry', l: 'Outlet Lease Expiry', type: 'date' },
+    title: 'Storage — Site', cols: 3, fields: [
+      { k: 'storageSizeSqft', l: 'Storage Sqft', type: 'number' },
+      { k: 'storageAddress', l: 'Storage Address', full: true },
+    ]
+  },
+  {
+    title: 'Storage — Lease', cols: 2, fields: [
+      { k: 'storageLeaseCommencement', l: 'Storage Lease Commencement', type: 'date' },
       { k: 'storageLeaseExpiry', l: 'Storage Lease Expiry', type: 'date' },
-      { k: 'landlordName', l: 'Landlord Name' },
-      { k: 'tenantName', l: 'Tenant Name' },
-      { k: 'lad', l: 'LAD Rate' },
-      { k: 'ladRemarks', l: 'LAD Remarks', full: true },
+    ]
+  },
+  {
+    title: 'Storage — Commercial', cols: 3, fields: [
+      { k: 'storageRental', l: 'Storage Monthly Rental (RM)', type: 'number' },
+    ]
+  },
+  {
+    title: 'Storage — Deposits', cols: 3, fields: [
+      { k: 'storageSecurityDeposit', l: 'Storage Security Deposit (RM)', type: 'number' },
+      { k: 'storageUtilitiesDeposit', l: 'Storage Utilities Deposit (RM)', type: 'number' },
+      { k: 'storageFitoutDeposit', l: 'Storage Fitout Deposit (RM)', type: 'number' },
+      { k: 'storageMailboxDeposit', l: 'Storage Mailbox Deposit (RM)', type: 'number' },
+      { k: 'storageRestorationDeposit', l: 'Storage Restoration Deposit (RM)', type: 'number' },
+      { k: 'storageOtherDeposit', l: 'Storage Other Deposit (RM)', type: 'number' },
     ]
   },
   {
@@ -124,7 +147,7 @@ const DB_FIELDS = [
   { key: 'state', label: 'State' }, { key: 'type', label: 'Location Type' },
   { key: 'model', label: 'Business Model' }, { key: 'status', label: 'Status' },
   { key: 'openingDate', label: 'Opening Date' }, { key: 'closureDate', label: 'Closure Date' },
-  { key: 'sqft', label: 'Store Sqft' }, { key: 'storageSizeSqft', label: 'Storage Sqft' }, { key: 'storageRental', label: 'Storage Rental' }, { key: 'storageSecurityDeposit', label: 'Storage Security Deposit' }, { key: 'storageUtilitiesDeposit', label: 'Storage Utilities Deposit' }, { key: 'storageFitoutDeposit', label: 'Storage Fitout Deposit' },
+  { key: 'sqft', label: 'Outlet Sqft' }, { key: 'storageSizeSqft', label: 'Storage Sqft' }, { key: 'storageRental', label: 'Storage Rental' }, { key: 'storageSecurityDeposit', label: 'Storage Security Deposit' }, { key: 'storageUtilitiesDeposit', label: 'Storage Utilities Deposit' }, { key: 'storageFitoutDeposit', label: 'Storage Fitout Dep' },
   { key: 'lat', label: 'Latitude' }, { key: 'lng', label: 'Longitude' },
   { key: 'outletAddress', label: 'Outlet Address' }, { key: 'storageAddress', label: 'Storage Address' },
   { key: 'monthlyRental', label: 'Monthly Base Rent' }, { key: 'monthlyGrossRent', label: 'Monthly Gross Rent' },
@@ -134,7 +157,7 @@ const DB_FIELDS = [
   { key: 'mailboxDeposit', label: 'Mailbox Deposit' }, { key: 'fitoutDeposit', label: 'Fitout Deposit' },
   { key: 'restorationDeposit', label: 'Restoration Deposit' }, { key: 'otherDeposit', label: 'Other Deposit' },
   { key: 'otherDepositRemark', label: 'Other Deposit Remark' },
-  { key: 'leaseExpiry', label: 'Outlet Lease Expiry' }, { key: 'storageLeaseExpiry', label: 'Storage Lease Expiry' },
+  { key: 'leaseCommencement', label: 'Outlet Lease Commencement' }, { key: 'leaseExpiry', label: 'Outlet Lease Expiry' }, { key: 'renewalNotice', label: 'Renewal Notice' }, { key: 'storageLeaseCommencement', label: 'Storage Lease Commencement' }, { key: 'storageLeaseExpiry', label: 'Storage Lease Expiry' },
   { key: 'lad', label: 'LAD Rate' }, { key: 'ladRemarks', label: 'LAD Remarks' },
   { key: 'landlordName', label: 'Landlord Name' }, { key: 'tenantName', label: 'Tenant Name' },
   { key: 'franchisee', label: 'Franchisee / PIC' }, { key: 'contact', label: 'Contact' }, { key: 'notes', label: 'Notes' },
@@ -152,7 +175,7 @@ const MOCK = [
 const rsr = (r, s) => (!s || s == 0) ? null : ((r / s) * 100).toFixed(1)
 const days = d => !d ? null : Math.ceil((new Date(d) - new Date()) / 86400000)
 const fRM = v => (v === '' || v === null || v === undefined) ? '—' : 'RM ' + Number(v).toLocaleString()
-const dep = o => [o.securityDeposit, o.utilitiesDeposit, o.mailboxDeposit, o.fitoutDeposit, o.restorationDeposit, o.otherDeposit, o.storageSecurityDeposit, o.storageUtilitiesDeposit, o.storageFitoutDeposit].reduce((s, v) => s + (Number(v) || 0), 0)
+const dep = o => [o.securityDeposit, o.utilitiesDeposit, o.mailboxDeposit, o.fitoutDeposit, o.restorationDeposit, o.otherDeposit, o.storageSecurityDeposit, o.storageUtilitiesDeposit, o.storageMailboxDeposit, o.storageFitoutDeposit, o.storageRestorationDeposit, o.storageOtherDeposit].reduce((s, v) => s + (Number(v) || 0), 0)
 const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '')
 const stopKey = e => e.stopPropagation()
 
@@ -162,7 +185,7 @@ function toDB(o) {
     outlet_code: o.outletCode, outlet_format: o.outletFormat, brand: o.brand,
     outlet_name: o.outletName, state: o.state, type: o.type, model: o.model, status: o.status,
     opening_date: o.openingDate || null, closure_date: o.closureDate || null,
-    sqft: o.sqft || null, storage_size_sqft: o.storageSizeSqft || null, storage_rental: o.storageRental || null, storage_security_deposit: o.storageSecurityDeposit || null, storage_utilities_deposit: o.storageUtilitiesDeposit || null, storage_fitout_deposit: o.storageFitoutDeposit || null,
+    sqft: o.sqft || null, storage_size_sqft: o.storageSizeSqft || null, storage_rental: o.storageRental || null, misc_rental: o.miscRental || null, storage_security_deposit: o.storageSecurityDeposit || null, storage_utilities_deposit: o.storageUtilitiesDeposit || null, storage_mailbox_deposit: o.storageMailboxDeposit || null, storage_fitout_deposit: o.storageFitoutDeposit || null, storage_restoration_deposit: o.storageRestorationDeposit || null, storage_other_deposit: o.storageOtherDeposit || null,
     lat: o.lat, lng: o.lng, outlet_address: o.outletAddress, storage_address: o.storageAddress,
     monthly_rental: o.monthlyRental || null, monthly_gross_rent: o.monthlyGrossRent || null,
     monthly_sales: o.monthlySales || null, atv: o.atv || null, gto: o.gto || null,
@@ -171,7 +194,7 @@ function toDB(o) {
     mailbox_deposit: o.mailboxDeposit || null, fitout_deposit: o.fitoutDeposit || null,
     restoration_deposit: o.restorationDeposit || null,
     other_deposit: o.otherDeposit || null, other_deposit_remark: o.otherDepositRemark || null,
-    lease_expiry: o.leaseExpiry || null, storage_lease_expiry: o.storageLeaseExpiry || null,
+    lease_commencement: o.leaseCommencement || null, lease_expiry: o.leaseExpiry || null, renewal_notice: o.renewalNotice || null, storage_lease_commencement: o.storageLeaseCommencement || null, storage_lease_expiry: o.storageLeaseExpiry || null,
     lad: o.lad, lad_remarks: o.ladRemarks, landlord_name: o.landlordName, tenant_name: o.tenantName,
     franchisee: o.franchisee, contact: o.contact, notes: o.notes,
   }
@@ -183,7 +206,7 @@ function fromDB(r) {
     brand: r.brand || '', outletName: r.outlet_name || '', state: r.state || '',
     type: r.type || '', model: r.model || '', status: r.status || 'Active',
     openingDate: r.opening_date || '', closureDate: r.closure_date || '',
-    sqft: r.sqft || '', storageSizeSqft: r.storage_size_sqft || '', storageRental: r.storage_rental || '', storageSecurityDeposit: r.storage_security_deposit || '', storageUtilitiesDeposit: r.storage_utilities_deposit || '', storageFitoutDeposit: r.storage_fitout_deposit || '',
+    sqft: r.sqft || '', storageSizeSqft: r.storage_size_sqft || '', storageRental: r.storage_rental || '', miscRental: r.misc_rental || '', storageSecurityDeposit: r.storage_security_deposit || '', storageUtilitiesDeposit: r.storage_utilities_deposit || '', storageMailboxDeposit: r.storage_mailbox_deposit || '', storageFitoutDeposit: r.storage_fitout_deposit || '', storageRestorationDeposit: r.storage_restoration_deposit || '', storageOtherDeposit: r.storage_other_deposit || '',
     lat: r.lat || '', lng: r.lng || '', outletAddress: r.outlet_address || '', storageAddress: r.storage_address || '',
     monthlyRental: r.monthly_rental || '', monthlyGrossRent: r.monthly_gross_rent || '',
     monthlySales: r.monthly_sales || '', atv: r.atv || '', gto: r.gto || '',
@@ -192,7 +215,7 @@ function fromDB(r) {
     mailboxDeposit: r.mailbox_deposit || '', fitoutDeposit: r.fitout_deposit || '',
     restorationDeposit: r.restoration_deposit || '',
     otherDeposit: r.other_deposit || '', otherDepositRemark: r.other_deposit_remark || '',
-    leaseExpiry: r.lease_expiry || '', storageLeaseExpiry: r.storage_lease_expiry || '',
+    leaseCommencement: r.lease_commencement || '', leaseExpiry: r.lease_expiry || '', renewalNotice: r.renewal_notice || '', storageLeaseCommencement: r.storage_lease_commencement || '', storageLeaseExpiry: r.storage_lease_expiry || '',
     lad: r.lad || '', ladRemarks: r.lad_remarks || '',
     landlordName: r.landlord_name || '', tenantName: r.tenant_name || '',
     franchisee: r.franchisee || '', contact: r.contact || '', notes: r.notes || '',
@@ -324,10 +347,73 @@ function parseCSV(text) {
 }
 
 function autoMap(headers) {
+  // Explicit mapping for known CSV headers
+  const EXPLICIT = {
+    'outletCode':              ['outlet code', 'outletcode'],
+    'outletFormat':            ['format', 'outlet format'],
+    'brand':                   ['brand'],
+    'outletName':              ['outlet name', 'outletname'],
+    'state':                   ['state', 'l1-state'],
+    'type':                    ['type'],
+    'model':                   ['model'],
+    'status':                  ['status'],
+    'openingDate':             ['opening date'],
+    'closureDate':             ['closure date'],
+    'sqft':                    ['outlet size', 'outlet sqft', 'sqft', 'outlet size (sqft)'],
+    'storageSizeSqft':         ['storage size', 'storage sqft', 'storage size (sqft)'],
+    'lat':                     ['lat', 'latitude'],
+    'lng':                     ['lon', 'lng', 'longitude'],
+    'outletAddress':           ['outlet address'],
+    'storageAddress':          ['storage address'],
+    'monthlyRental':           ['outlet base rent', 'base rent', 'monthly base rent'],
+    'monthlyGrossRent':        ['outlet gross rent', 'gross rent', 'monthly gross rent'],
+    'monthlySales':            ['avg monthly sales', 'monthly sales'],
+    'atv':                     ['atv'],
+    'gto':                     ['gto'],
+    'serviceCharge':           ['outlet service chr', 'service charge', 'service chr'],
+    'apFees':                  ['outlet a&p fee', 'a&p fee', 'a&p fees'],
+    'miscRental':              ['misc rent', 'misc rental'],
+    'securityDeposit':         ['outlet sec depo', 'outlet security deposit', 'sec depo'],
+    'utilitiesDeposit':        ['outlet uti depo', 'outlet utilities deposit', 'uti depo'],
+    'mailboxDeposit':          ['outlet mail box depo', 'outlet mailbox deposit', 'mail box depo'],
+    'fitoutDeposit':           ['outlet fit out depo', 'outlet fitout deposit', 'fit out depo'],
+    'restorationDeposit':      ['outlet resto depo', 'outlet restoration deposit', 'resto depo'],
+    'otherDeposit':            ['other dep', 'other deposit'],
+    'leaseCommencement':       ['lease commencement'],
+    'leaseExpiry':             ['lease expiry', 'outlet lease expiry'],
+    'renewalNotice':           ['renewal notice', 'renewal notice (mth)'],
+    'lad':                     ['lad'],
+    'ladRemarks':              ['lad remarks'],
+    'storageRental':           ['storage rent', 'storage rental', 'storage monthly rental'],
+    'storageSecurityDeposit':  ['storage sec depo', 'storage security deposit'],
+    'storageUtilitiesDeposit': ['storage util depo', 'storage utilities deposit'],
+    'storageMailboxDeposit':   ['storage mail box depo', 'storage mailbox deposit'],
+    'storageFitoutDeposit':    ['storage fit out depo', 'storage fitout deposit'],
+    'storageRestorationDeposit':['storage resto depo', 'storage restoration deposit'],
+    'storageOtherDeposit':     ['storage other dep', 'storage other deposit'],
+    'storageLeaseCommencement':['storage comm date', 'storage commencement'],
+    'storageLeaseExpiry':      ['storage exp date', 'storage lease expiry', 'storage expiry'],
+    'landlordName':            ['landlord'],
+    'tenantName':              ['tenant'],
+    'franchisee':              ['franchisee'],
+    'contact':                 ['contact'],
+    'notes':                   ['notes'],
+  }
   const map = {}
+  const normH = h => h.toLowerCase().replace(/[
+
+]+/g, ' ').replace(/[^a-z0-9& ]/g, '').replace(/s+/g, ' ').trim()
   DB_FIELDS.forEach(f => {
-    const fk = norm(f.key), fl = norm(f.label)
-    const match = headers.find(h => { const hn = norm(h); return hn === fk || hn === fl || hn.includes(fk) || fk.includes(hn) || hn.includes(fl) || fl.includes(hn) })
+    const targets = EXPLICIT[f.key] || []
+    const match = headers.find(h => {
+      const hn = normH(h)
+      // Check explicit targets first
+      if (targets.some(t => hn === t || hn.includes(t) || t.includes(hn))) return true
+      // Fallback to generic norm match
+      const fk = norm(f.key), fl = norm(f.label)
+      const hn2 = norm(h)
+      return hn2 === fk || hn2 === fl || hn2.includes(fl) || fl.includes(hn2)
+    })
     map[f.key] = match || ''
   })
   return map
@@ -651,7 +737,7 @@ function AppContent({ role, onLogout }) {
 
   function exportCSV() {
     const keys = ['outletCode', 'outletFormat', 'brand', 'outletName', 'state', 'type', 'model', 'status', 'openingDate', 'closureDate', 'sqft', 'storageSizeSqft', 'storageRental', 'storageSecurityDeposit', 'storageUtilitiesDeposit', 'storageFitoutDeposit', 'lat', 'lng', 'outletAddress', 'storageAddress', 'monthlyRental', 'monthlyGrossRent', 'monthlySales', 'atv', 'gto', 'serviceCharge', 'apFees', 'securityDeposit', 'utilitiesDeposit', 'mailboxDeposit', 'fitoutDeposit', 'restorationDeposit', 'otherDeposit', 'otherDepositRemark', 'leaseExpiry', 'lad', 'ladRemarks', 'landlordName', 'tenantName', 'franchisee', 'contact', 'notes']
-    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Sqft', 'Storage Sqft', 'Storage Rental', 'Storage Sec Deposit', 'Storage Util Deposit', 'Storage Fitout Deposit', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
+    const hdrs = ['Outlet Code', 'Format', 'Brand', 'Outlet Name', 'State', 'Type', 'Model', 'Status', 'Opening Date', 'Closure Date', 'Outlet Sqft', 'Storage Sqft', 'Storage Rental', 'Storage Sec Dep', 'Storage Util Dep', 'Storage Fitout Dep', 'Lat', 'Lng', 'Outlet Address', 'Storage Address', 'Monthly Base Rent', 'Monthly Gross Rent', 'Avg Monthly Sales', 'ATV', 'GTO %', 'Service Charge', 'A&P Fees', 'Security Deposit', 'Utilities Deposit', 'Mailbox Deposit', 'Fitout Deposit', 'Restoration Deposit', 'Other Deposit', 'Other Deposit Remark', 'Lease Expiry', 'LAD', 'LAD Remarks', 'Landlord', 'Tenant', 'Franchisee', 'Contact', 'Notes']
     const rows = filtered.map(o => [...keys.map(k => o[k] ?? ''), rsr(o.monthlyGrossRent || o.monthlyRental, o.monthlySales) ?? ''])
     const csv = [[...hdrs, 'R/S Ratio (%)'], ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
     const a = document.createElement('a')
@@ -814,7 +900,7 @@ function AppContent({ role, onLogout }) {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        {[['outletCode', 'Code'], ['outletFormat', 'Format'], ['brand', 'Brand'], ['outletName', 'Outlet Name'], ['state', 'State'], ['type', 'Type'], ['model', 'Model'], ['status', 'Status'], ['sqft', 'Sqft'], ['monthlyRental', 'Base Rent'], ['monthlyGrossRent', 'Gross Rent'], ['monthlySales', 'Avg Sales'], ['_rs', 'R/S'], ['leaseExpiry', 'Lease'], ['franchisee', 'PIC']].map(([k, l]) => (
+                        {[['outletCode', 'Code'], ['outletFormat', 'Format'], ['brand', 'Brand'], ['outletName', 'Outlet Name'], ['state', 'State'], ['type', 'Type'], ['model', 'Model'], ['status', 'Status'], ['sqft', 'Outlet Sqft'], ['monthlyRental', 'Base Rent'], ['monthlyGrossRent', 'Gross Rent'], ['monthlySales', 'Avg Sales'], ['_rs', 'R/S'], ['leaseExpiry', 'Lease'], ['franchisee', 'PIC']].map(([k, l]) => (
                           <th key={k} onClick={() => !k.startsWith('_') && sortBy(k)} style={{ ...TH, cursor: 'pointer', color: sortK === k ? C.accent : C.sub }}>{l}{sortK === k ? (sortAsc ? ' ↑' : ' ↓') : ''}</th>
                         ))}
                         {isAdmin && <th style={TH}>ACTIONS</th>}
