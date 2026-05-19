@@ -349,50 +349,50 @@ function parseCSV(text) {
 function autoMap(headers) {
   // Explicit mapping for known CSV headers
   const EXPLICIT = {
-    'outletCode':              ['outlet code', 'outletcode'],
+    'outletCode':              ['outlet code'],
     'outletFormat':            ['format', 'outlet format'],
     'brand':                   ['brand'],
-    'outletName':              ['outlet name', 'outletname'],
-    'state':                   ['state', 'l1-state'],
+    'outletName':              ['outlet name'],
+    'state':                   ['state'],
     'type':                    ['type'],
     'model':                   ['model'],
     'status':                  ['status'],
     'openingDate':             ['opening date'],
     'closureDate':             ['closure date'],
-    'sqft':                    ['outlet size', 'outlet sqft', 'sqft', 'outlet size (sqft)'],
-    'storageSizeSqft':         ['storage size', 'storage sqft', 'storage size (sqft)'],
+    'sqft':                    ['outlet size', 'outlet sqft'],
+    'storageSizeSqft':         ['storage size', 'storage sqft'],
     'lat':                     ['lat', 'latitude'],
     'lng':                     ['lon', 'lng', 'longitude'],
     'outletAddress':           ['outlet address'],
     'storageAddress':          ['storage address'],
-    'monthlyRental':           ['outlet base rent', 'base rent', 'monthly base rent'],
-    'monthlyGrossRent':        ['outlet gross rent', 'gross rent', 'monthly gross rent'],
+    'monthlyRental':           ['outlet base rent', 'base rent'],
+    'monthlyGrossRent':        ['outlet gross rent', 'gross rent'],
     'monthlySales':            ['avg monthly sales', 'monthly sales'],
     'atv':                     ['atv'],
     'gto':                     ['gto'],
-    'serviceCharge':           ['outlet service chr', 'service charge', 'service chr'],
-    'apFees':                  ['outlet a&p fee', 'a&p fee', 'a&p fees'],
+    'serviceCharge':           ['outlet service chr', 'service chr'],
+    'apFees':                  ['outlet a&p fee', 'a&p fee'],
     'miscRental':              ['misc rent', 'misc rental'],
-    'securityDeposit':         ['outlet sec depo', 'outlet security deposit', 'sec depo'],
-    'utilitiesDeposit':        ['outlet uti depo', 'outlet utilities deposit', 'uti depo'],
-    'mailboxDeposit':          ['outlet mail box depo', 'outlet mailbox deposit', 'mail box depo'],
-    'fitoutDeposit':           ['outlet fit out depo', 'outlet fitout deposit', 'fit out depo'],
-    'restorationDeposit':      ['outlet resto depo', 'outlet restoration deposit', 'resto depo'],
-    'otherDeposit':            ['other dep', 'other deposit'],
+    'securityDeposit':         ['outlet sec depo', 'outlet security deposit'],
+    'utilitiesDeposit':        ['outlet uti depo', 'outlet utilities deposit'],
+    'mailboxDeposit':          ['outlet mail box depo', 'outlet mailbox deposit'],
+    'fitoutDeposit':           ['outlet fit out depo', 'outlet fitout deposit'],
+    'restorationDeposit':      ['outlet resto depo', 'outlet restoration deposit'],
+    'otherDeposit':            ['other dep'],
     'leaseCommencement':       ['lease commencement'],
-    'leaseExpiry':             ['lease expiry', 'outlet lease expiry'],
+    'leaseExpiry':             ['lease expiry'],
     'renewalNotice':           ['renewal notice', 'renewal notice (mth)'],
-    'lad':                     ['lad'],
     'ladRemarks':              ['lad remarks'],
-    'storageRental':           ['storage rent', 'storage rental', 'storage monthly rental'],
+    'lad':                     ['lad'],
+    'storageRental':           ['storage rent', 'storage rental'],
     'storageSecurityDeposit':  ['storage sec depo', 'storage security deposit'],
     'storageUtilitiesDeposit': ['storage util depo', 'storage utilities deposit'],
     'storageMailboxDeposit':   ['storage mail box depo', 'storage mailbox deposit'],
     'storageFitoutDeposit':    ['storage fit out depo', 'storage fitout deposit'],
     'storageRestorationDeposit':['storage resto depo', 'storage restoration deposit'],
     'storageOtherDeposit':     ['storage other dep', 'storage other deposit'],
-    'storageLeaseCommencement':['storage comm date', 'storage commencement'],
-    'storageLeaseExpiry':      ['storage exp date', 'storage lease expiry', 'storage expiry'],
+    'storageLeaseCommencement':['storage comm date'],
+    'storageLeaseExpiry':      ['storage exp date', 'storage expiry'],
     'landlordName':            ['landlord'],
     'tenantName':              ['tenant'],
     'franchisee':              ['franchisee'],
@@ -405,14 +405,15 @@ function autoMap(headers) {
 ]+/g, ' ').replace(/[^a-z0-9& ]/g, '').replace(/s+/g, ' ').trim()
   DB_FIELDS.forEach(f => {
     const targets = EXPLICIT[f.key] || []
+    // Sort targets by length descending so longer/more specific targets match first
+    const sortedTargets = [...targets].sort((a,b) => b.length - a.length)
     const match = headers.find(h => {
       const hn = normH(h)
-      // Check explicit targets first
-      if (targets.some(t => hn === t || hn.includes(t) || t.includes(hn))) return true
-      // Fallback to generic norm match
+      if (sortedTargets.some(t => hn === t)) return true  // exact match first
+      if (sortedTargets.some(t => hn === t || hn.includes(t) || t.includes(hn))) return true
       const fk = norm(f.key), fl = norm(f.label)
       const hn2 = norm(h)
-      return hn2 === fk || hn2 === fl || hn2.includes(fl) || fl.includes(hn2)
+      return hn2 === fk || hn2 === fl
     })
     map[f.key] = match || ''
   })
