@@ -335,13 +335,30 @@ function BrandManager({ allBrands, customBrands, onAdd, onDelete }) {
 
 // ── CSV helpers ───────────────────────────────────────────────────────────────
 function parseCSV(text) {
-  const lines = text.trim().split('\n')
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim())
-  const rows = lines.slice(1).map(line => {
-    const vals = []; let cur = '', inQ = false
-    for (const ch of line) { if (ch === '"') inQ = !inQ; else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = '' } else cur += ch }
-    vals.push(cur.trim())
-    const obj = {}; headers.forEach((h, i) => { obj[h] = vals[i] || '' }); return obj
+  // Full RFC-4180 parser — handles quoted fields with embedded newlines
+  const t = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  const tokens = []
+  let cur = '', inQ = false
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i]
+    if (ch === '"') {
+      if (inQ && t[i+1] === '"') { cur += '"'; i++ }
+      else inQ = !inQ
+    } else if (ch === ',' && !inQ) {
+      tokens.push({ v: cur, nl: false }); cur = ''
+    } else if (ch === '\n' && !inQ) {
+      tokens.push({ v: cur, nl: true }); cur = ''
+    } else { cur += ch }
+  }
+  tokens.push({ v: cur, nl: true })
+  const allRows = []; let row = []
+  for (const tok of tokens) {
+    row.push(tok.v.trim())
+    if (tok.nl) { if (row.some(v => v)) allRows.push(row); row = [] }
+  }
+  const headers = allRows[0].map(h => h.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim())
+  const rows = allRows.slice(1).filter(r => r.some(v => v)).map(r => {
+    const obj = {}; headers.forEach((h, i) => { obj[h] = r[i] || '' }); return obj
   })
   return { headers, rows }
 }
@@ -401,8 +418,10 @@ function autoMap(headers) {
   }
   const map = {}
   const normH = h => h.split('\n').join(' ').split('\r').join(' ').toLowerCase().split('  ').join(' ').replace(/[^a-z0-9& ]/g, '').trim()
-]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
-]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
+
+]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
+
+]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
   DB_FIELDS.forEach(f => {
     const targets = EXPLICIT[f.key] || []
     // Sort targets by length descending so longer/more specific targets match first
