@@ -418,10 +418,8 @@ function autoMap(headers) {
   }
   const map = {}
   const normH = h => h.split('\n').join(' ').split('\r').join(' ').toLowerCase().split('  ').join(' ').replace(/[^a-z0-9& ]/g, '').trim()
-
-]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
-
-]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
+]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
+]+/g, " ").replace(/[^a-z0-9& ]/g, "").replace(/s+/g, " ").trim()
   DB_FIELDS.forEach(f => {
     const targets = EXPLICIT[f.key] || []
     // Sort targets by length descending so longer/more specific targets match first
